@@ -1,0 +1,18 @@
+{
+  "timestamp": "2026-03-15T12:56:56.425890",
+  "test": "Dutch parliamentary summarization",
+  "context_size": 131072,
+  "input_chars": 128922,
+  "input_tokens_est": 32721,
+  "temperature": 0.3,
+  "input_text_preview": "Aan de orde is de behandeling van de wetsvoorstellen:\n\nVaststelling van de begroting van de uitgaven en de ontvangsten van de Nationale Schuld (IXA) voor het jaar 1995 (23900-IXA);\n\nWijziging van hoof...",
+  "results": {
+    "RedHatAI/gemma-3-27b-it-quantized.w4a16": {
+      "content": "## Samenvatting Parlementaire Bijdrage - De Boer (GroenLinks)\n\n**1. Hoofdpunten:**\n\n*   De spreker benadrukt de complexiteit van het fiscale systeem en de noodzaak van een langetermijnvisie, kritisch op ad-hoc maatregelen.\n*   Er is bezorgdheid over de budgettaire neutraliteit en de impact van fiscale maatregelen op specifieke groepen, zoals ouderen en werknemers.\n*   De spreker pleit voor een heroverweging van de prioriteiten binnen het fiscale beleid, met meer aandacht voor de verdeling van lasten en de stimulering van de economie.\n*   Er is kritiek op de snelheid van wetsvoorstellen en de mogelijke gevolgen voor de kwaliteit van de wetgeving.\n\n**2. Vragen aan de minister:**\n\n1.  Wat is de visie van de regering op de verhouding tussen belasting en premies in de eerste schijf, en welke norm wordt gehanteerd voor een evenwichtige verdeling?\n2.  Hoe beoordeelt de regering de impact van de afschaffing van de renteaftrek op consumptief krediet op de economische groei en de werkgelegenheid?\n3.  Welke maatregelen zal de regering nemen om de negatieve gevolgen van de afschaffing van de renteaftrek voor de minder draagkrachtigen te beperken?\n4.  Hoe ziet de regering de rol van de EU in de bestrijding van de werkloosheid en welke financiële consequenties heeft dit voor Nederland?\n5.  Welke prioriteit geeft de regering aan de vermindering van de staatsschuld en welke maatregelen worden genomen om dit doel te bereiken?\n6.  Hoe beoordeelt de regering de impact van de loonsomheffing op werknemersspaarregelingen op de werkgevers en welke alternatieven worden overwogen?\n7.  Hoe zal de regering de afstemming tussen het fiscale begrip \"pensioen\" en de Pensioen- en spaarfondsenwet verbeteren?\n8.  Welke visie heeft de regering op de toekomstige ontwikkeling van de vermogensbelasting en welke stappen worden ondernomen om deze te hervormen?\n\n**3. Standpunt fractie:**\n\nGroenLinks benadrukt het belang van een eerlijk en duurzaam fiscaal beleid dat rekening houdt met de belangen van alle burgers, met speciale aandacht voor de zwakkeren in de samenleving. De fractie is kritisch op ad-hoc maatregelen en pleit voor een langetermijnvisie.\n\n**4. Toon:**\n\nKritisch.",
+      "prompt_tokens": 32960,
+      "completion_tokens": 585,
+      "elapsed": 27.803926116001094,
+      "tokens_per_sec": 21.040194020057257
+    }
+  }
+}

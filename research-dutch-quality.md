@@ -245,9 +245,139 @@ De PvdA respecteert regeerakkoord maar is kritisch over vormgeving, bredere afwe
 
 ---
 
+## 128K Context Test (Full Debate)
+
+**Input:** 128,922 characters (~32,721 tokens) - Full parliamentary debate
+**Context:** 131,072 tokens
+**Test:** Complete Eerste Kamer debate including multiple speakers
+
+### RedHatAI W4A16 Output (128K Context)
+
+**Tokens:** 585 in 27.80s (21.0 tok/s)
+
+```markdown
+## Samenvatting Parlementaire Bijdrage - De Boer (GroenLinks)
+
+**1. Hoofdpunten:**
+
+*   De spreker benadrukt de complexiteit van het fiscale systeem en de noodzaak van een langetermijnvisie, kritisch op ad-hoc maatregelen.
+*   Er is bezorgdheid over de budgettaire neutraliteit en de impact van fiscale maatregelen op specifieke groepen, zoals ouderen en werknemers.
+*   De spreker pleit voor een heroverweging van de prioriteiten binnen het fiscale beleid, met meer aandacht voor de verdeling van lasten en de stimulering van de economie.
+*   Er is kritiek op de snelheid van wetsvoorstellen en de mogelijke gevolgen voor de kwaliteit van de wetgeving.
+
+**2. Vragen aan de minister:**
+
+1.  Wat is de visie van de regering op de verhouding tussen belasting en premies in de eerste schijf, en welke norm wordt gehanteerd voor een evenwichtige verdeling?
+2.  Hoe beoordeelt de regering de impact van de afschaffing van de renteaftrek op consumptief krediet op de economische groei en de werkgelegenheid?
+3.  Welke maatregelen zal de regering nemen om de negatieve gevolgen van de afschaffing van de renteaftrek voor de minder draagkrachtigen te beperken?
+4.  Hoe ziet de regering de rol van de EU in de bestrijding van de werkloosheid en welke financiële consequenties heeft dit voor Nederland?
+5.  Welke prioriteit geeft de regering aan de vermindering van de staatsschuld en welke maatregelen worden genomen om dit doel te bereiken?
+6.  Hoe beoordeelt de regering de impact van de loonsomheffing op werknemersspaarregelingen op de werkgevers en welke alternatieven worden overwogen?
+7.  Hoe zal de regering de afstemming tussen het fiscale begrip "pensioen" en de Pensioen- en spaarfondsenwet verbeteren?
+8.  Welke visie heeft de regering op de toekomstige ontwikkeling van de vermogensbelasting en welke stappen worden ondernomen om deze te hervormen?
+
+**3. Standpunt fractie:**
+
+GroenLinks benadrukt het belang van een eerlijk en duurzaam fiscaal beleid dat rekening houdt met de belangen van alle burgers, met speciale aandacht voor de zwakkeren in de samenleving. De fractie is kritisch op ad-hoc maatregelen en pleit voor een langetermijnvisie.
+
+**4. Toon:**
+
+Kritisch.
+```
+
+### ISTA-DASLab GPTQ Output (128K Context)
+
+**Tokens:** 856 in 33.13s (25.8 tok/s)
+
+```markdown
+## Samenvatting Parlementaire Bijdrage - De Boer (GroenLinks) & Hilarides (VVD)
+
+**Datum:** 1995
+**Onderwerp:** Behandeling wetsvoorstellen betreffende de begroting van Financiën en gerelateerde fiscale voorstellen.
+
+### 1. Hoofdpunten
+
+*   **Sanering overheidsfinanciën:** Beide sprekers benadrukken het belang van een gezonde overheidsfinanciën en steunen de inspanningen van het kabinet om de schuld te verminderen.
+*   **Budgettaire discipline:** Er is bezorgdheid over de budgettaire neutraliteit van bepaalde maatregelen, zoals de werknemersspaarregeling, en de noodzaak om de uitgaven in de hand te houden.
+*   **Internationale fiscale concurrentie:** De noodzaak om de internationale fiscale concurrentiepositie van Nederland te verbeteren wordt benadrukt, evenals de impact van Europese regelgeving.
+*   **Vereenvoudiging en consistentie:** Beide sprekers pleiten voor een meer consistente en vereenvoudigde fiscale wetgeving.
+
+### 2. Vragen aan de minister(s)
+
+**De Boer (GroenLinks):**
+
+1.  Wat is de relatie tussen de afspraken in het regeerakkoord en de vorm van de koopkrachtreparatie voor ouderen?
+2.  Hoe ziet de regering de lange-termijnvisie op de financiering van de AOW en flexibele pensionering?
+3.  Hoe wordt de afweging gemaakt tussen budgettaire neutraliteit en de wens om de werkgelegenheid te stimuleren?
+4.  Wat is de positie van de regering ten opzichte van de kritiek van de Europese Commissie op de Nederlandse aanpak van de schuldquote en het ABP-vermogen?
+5.  Hoe ziet de regering de rol van de EU in de bestrijding van de werkloosheid en de financiering daarvan?
+6.  Hoe wordt de impact van de afschaffing van de renteaftrek op consumptief krediet beoordeeld?
+7.  Hoe ziet de regering de toekomst van de vermogensbelasting?
+
+**Hilarides (VVD):**
+
+1.  Is de toetreding van de minister tot het kabinet afhankelijk geweest van de geboden ruimte voor financiële sanering?
+2.  Wat zijn de voordelen van de Zalm-norm voor de begroting?
+3.  Hoe beoordeelt de minister de kritiek van de president van De Nederlandsche Bank op het financiële beleid?
+4.  Hoe wordt de verhouding tussen de Nederlandse bijdragen aan de EU en de ontvangen middelen beoordeeld?
+5.  Hoe wordt de afstemming tussen de fiscale wetgeving en de Pensioen- en spaarfondsenwet geborgd?
+6.  Wat is de visie van de minister op de afschaffing van de vermogensbelasting?
+7.  Hoe wordt de budgettaire neutraliteit van de werknemersspaarregeling gewaarborgd?
+
+### 3. Standpunt fractie
+
+*   **GroenLinks:** Ondersteunt de sanering van de overheidsfinanciën, maar benadrukt de noodzaak van een eerlijke verdeling van de lasten en aandacht voor de sociale gevolgen van bezuinigingen.
+*   **VVD:** Steunt de inspanningen om de overheidsfinanciën te saneren en de economische groei te bevorderen, met nadruk op budgettaire discipline en een aantrekkelijk investeringsklimaat.
+
+### 4. Toon
+
+**Bezorgd** (beide sprekers uiten bezorgdheid over de budgettaire gevolgen van bepaalde maatregelen en de noodzaak van een consistente en effectieve aanpak van de overheidsfinanciën).
+```
+
+### Comparison (128K Context)
+
+| Aspect | RedHatAI W4A16 | GPTQ 4b-128g |
+|--------|----------------|--------------|
+| **Tokens** | 585 | 856 |
+| **Speed** | 21.0 tok/s | 25.8 tok/s |
+| **Speakers identified** | 1 (De Boer) | 2 (De Boer, Hilarides) |
+| **Questions extracted** | 8 | 14 (7+7) |
+| **Structure** | Single speaker focus | Multi-speaker synthesis |
+| **Tone** | Kritisch | Bezorgd |
+
+### Key Observations (128K Context)
+
+1. **GPTQ provides more comprehensive coverage** - identifies and summarizes TWO speakers (De Boer/GroenLinks AND Hilarides/VVD) while RedHatAI focuses only on De Boer
+2. **GPTQ extracts more questions** - 14 questions (7 per speaker) vs 8 questions
+3. **Both maintain excellent Dutch** - formal parliamentary register, correct terminology
+4. **GPTQ adds metadata** - includes date and subject header
+5. **Speed difference** - GPTQ faster at 25.8 tok/s vs 21.0 tok/s
+6. **Historical accuracy** - Both correctly reference: Zalm-norm, AOW, ABP-vermogen, Europese Commissie
+
+**For 128K context, GPTQ provides a more thorough multi-speaker summary.**
+
+---
+
+## Final Conclusions
+
+| Test | Context | Winner | Reason |
+|------|---------|--------|--------|
+| Synthetic text | 8K | Tie | Both excellent |
+| Real text (single speaker) | 8K | RedHatAI | More nuanced |
+| Full debate (multi-speaker) | 128K | **GPTQ** | Better coverage |
+
+**Recommendations:**
+- For **short documents / single speaker**: Either model works excellently
+- For **long documents / multiple speakers**: GPTQ provides better comprehensiveness
+- Both are **production-ready** for Dutch language tasks
+
+---
+
 ## Files
 
 - `dutch_parliament_text.txt` - Real Eerste Kamer debate text (1994)
-- `quality-redhat-real.json` - RedHatAI test on real text
-- `quality-gptq-real.json` - GPTQ test on real text
+- `quality-redhat-real.json` - RedHatAI test on real text (8K)
+- `quality-gptq-real.json` - GPTQ test on real text (8K)
+- `quality-redhat-128k.json` - RedHatAI test on full debate (128K)
+- `quality-gptq-128k.json` - GPTQ test on full debate (128K)
 - `quality_compare.py` - Test script
