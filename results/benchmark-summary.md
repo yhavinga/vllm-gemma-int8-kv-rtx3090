@@ -37,13 +37,13 @@ All context sizes work with CUDA graphs and achieve similar performance:
 
 | Context | Launch Script | GPU Mem Util | Single tok/s | Batch tok/s |
 |---------|---------------|--------------|--------------|-------------|
-| 8K      | `launch-optimized.sh` | 0.90 | 67 | 244 |
-| 32K     | `launch-optimized-32k.sh` | 0.90 | 67 | 243 |
-| 128K    | `launch-optimized-128k.sh` | 0.95 | 67 | 241 |
+| 8K      | `scripts/launch-server.sh` | 0.90 | 67 | 244 |
+| 32K     | `scripts/launch-server-32k.sh` | 0.90 | 67 | 243 |
+| 128K    | `scripts/launch-server-128k.sh` | 0.95 | 67 | 241 |
 
 **Key insight:** W4A16 quantization enables full 128K context on dual RTX 3090 with no speed loss!
 
-See `research-context-scaling.md` for detailed memory analysis.
+See `research/02-context-scaling.md` for detailed memory analysis.
 
 ---
 
@@ -290,9 +290,9 @@ curl http://localhost:8000/v1/chat/completions \
 
 ## Files
 
-- `/home/yeb/Developer/gemma/venv/` - Python virtual environment with vLLM 0.17.1 + PyTorch 2.10
-- `/home/yeb/Developer/gemma/launch-optimized.sh` - Launch script with all optimizations
-- `/home/yeb/Developer/gemma/benchmark.py` - Benchmark script for measuring performance
+- `venv/` - Python virtual environment with vLLM 0.17.1 + PyTorch 2.10
+- `scripts/launch-server.sh` - Launch script with all optimizations
+- `scripts/benchmark.py` - Benchmark script for measuring performance
 - `~/.cache/huggingface/` - Downloaded model weights
 
 ---
@@ -366,6 +366,6 @@ vllm serve ... -cc.cudagraph_mode=none  # No --enforce-eager
 | torch.compile without cudagraph_mode=none | Crashes/OOM |
 
 ### Helper Scripts
-- `launch-optimized.sh` - Launch with all optimizations
-- `benchmark.py` - Measure tokens/sec and compare configs
-- `exllamav2-setup.md` - Guide for ExLlamaV2 alternative (not yet tested)
+- `scripts/launch-server.sh` - Launch with all optimizations
+- `scripts/benchmark.py` - Measure tokens/sec and compare configs
+- `docs/exllamav2-alternative.md` - Guide for ExLlamaV2 alternative (not yet tested)

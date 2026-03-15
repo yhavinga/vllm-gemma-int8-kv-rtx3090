@@ -16,7 +16,7 @@ import requests
 # Eerste Kamer debate, December 20, 1994 - Mr. Schinck (PvdA) on tax legislation
 import os
 
-_DEFAULT_TEXT_FILE = os.path.join(os.path.dirname(__file__), "dutch_parliament_text.txt")
+_DEFAULT_TEXT_FILE = os.path.join(os.path.dirname(__file__), "..", "data", "dutch_parliament_text.txt")
 
 def load_dutch_text(filepath=None, max_chars=None):
     """Load Dutch parliamentary text from file, truncated to fit context.

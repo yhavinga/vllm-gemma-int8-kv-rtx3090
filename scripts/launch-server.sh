@@ -39,7 +39,7 @@ echo ""
 
 # Activate virtual environment
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "${SCRIPT_DIR}/venv/bin/activate"
+source "${SCRIPT_DIR}/../venv/bin/activate"
 
 # Launch vLLM server with CUDA graphs
 # --disable-custom-all-reduce is REQUIRED for CUDA graphs on RTX 3090

@@ -13,8 +13,9 @@ __pycache__/
 dist/
 build/
 
-# Benchmark results (temporary)
-benchmark-*.json
+# Temporary benchmark output (in root)
+/benchmark-*.json
+/quality-*.json
 
 # IDE
 .idea/
