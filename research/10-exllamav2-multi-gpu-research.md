@@ -14,10 +14,8 @@
 |------------|----------------|----------------|-------------|
 | **1B** | **NO** | **NO** | Use vLLM W8A8 |
 | **4B** | **NO** | **NO** | Use vLLM W4A16 |
-| **12B** | **NO** | Derivative only* | Use vLLM W4A16 |
-| **27B** | **YES** (turboderp) | **YES** (turboderp) | **Caution: known bugs** |
-
-*Tiger-Gemma-12B-v3-EXL3 is a fine-tuned derivative, not base Gemma 3 12B.
+| **12B** | **YES** (turboderp) | Derivative only | **TEST** |
+| **27B** | **YES** (turboderp) | **YES** (turboderp) | **TEST** |
 
 ### Key Finding: Stick with vLLM for Gemma 3
 
@@ -69,8 +67,9 @@ From [Himesh's benchmarks](http://himeshp.blogspot.com/2025/03/vllm-performance-
 
 | Model | Format | Bitrates | Source |
 |-------|--------|----------|--------|
+| [gemma-3-27b-it-exl3](https://huggingface.co/turboderp/gemma-3-27b-it-exl3) | EXL3 | 2.0, 2.5, 3.0, 3.5, 4.0, 5.0, 6.0, 8.0 bpw | turboderp |
 | [gemma-3-27b-it-exl2](https://huggingface.co/turboderp/gemma-3-27b-it-exl2) | EXL2 | 3.0, 4.0, 5.0, 6.0 bpw | turboderp |
-| [gemma-3-27b-it-exl3](https://huggingface.co/turboderp/gemma-3-27b-it-exl3) | EXL3 | Multiple | turboderp |
+| [gemma-3-12b-it-exl2](https://huggingface.co/turboderp/gemma-3-12b-it-exl2) | EXL2 | 3.0, 4.0, 5.0, 6.0 bpw | turboderp |
 
 ### What's Missing
 
@@ -78,7 +77,6 @@ From [Himesh's benchmarks](http://himeshp.blogspot.com/2025/03/vllm-performance-
 |-------|------|------|-------------|
 | gemma-3-1b-it | **NONE** | **NONE** | RedHatAI W8A8 (vLLM) |
 | gemma-3-4b-it | **NONE** | **NONE** | RedHatAI W4A16 (vLLM) |
-| gemma-3-12b-it | **NONE** | **NONE** | RedHatAI W4A16 (vLLM) |
 
 ### Community Derivatives
 
@@ -250,27 +248,32 @@ For dual RTX 3090 with tensor_parallel:
 
 ## Performance Comparison: vLLM vs ExLlamaV2
 
-### Our Measured vLLM Results (27B)
+### MEASURED RESULTS (2026-03-15)
 
-| Config | Single tok/s | Batch(4) tok/s |
-|--------|--------------|----------------|
-| **vLLM W4A16 TP=2** | **67.5** | **244.3** |
-| vLLM (baseline) | 11 | 40 |
+| Backend | Mode | Single tok/s | Notes |
+|---------|------|--------------|-------|
+| **vLLM W4A16** | **TP=2** | **67.5** | Tensor parallelism works |
+| ExLlamaV2 EXL2 4bpw | gpu_split | **42** | **TP NOT SUPPORTED** |
 
-### Expected ExLlamaV2 Performance (Estimated)
+**vLLM is 60% faster than ExLlamaV2 for Gemma 3 27B!**
 
-Based on community reports and architecture analysis:
+### Critical Discovery: No Tensor Parallelism for Gemma 3
 
-| Config | Estimated Single tok/s | Notes |
-|--------|------------------------|-------|
-| ExLlamaV2 TP=2, 4bpw | ~50-70 | Comparable to vLLM |
-| ExLlamaV2 gpu_split | ~25-40 | Lower than TP |
+```
+AssertionError: Tensor-parallel is NOT supported for Gemma3ForConditionalGeneration
+```
 
-**Why ExLlamaV2 may not beat vLLM here:**
-1. vLLM 0.17.1 has highly optimized CUDA graphs
-2. Our CUDA graph config (`FULL_DECODE_ONLY`) is proven
-3. Marlin kernels (vLLM) are already excellent for W4A16
-4. ExLlamaV2 TP implementation is newer, less mature
+ExLlamaV2 only supports `gpu_split` (layer distribution) for Gemma 3, not true tensor parallelism. This means:
+- GPU 0 processes layers 0-19, then passes to GPU 1
+- GPU 1 processes layers 20-39
+- **Sequential, not parallel** - one GPU waits while the other works
+
+### Why vLLM Wins
+
+1. **True tensor parallelism**: Both GPUs work simultaneously on each layer
+2. **NVLink utilization**: vLLM uses NVLink for inter-GPU communication
+3. **CUDA graphs**: Our optimized config (`FULL_DECODE_ONLY`) is proven
+4. **Marlin kernels**: Already excellent for W4A16 quantization
 
 ---
 
