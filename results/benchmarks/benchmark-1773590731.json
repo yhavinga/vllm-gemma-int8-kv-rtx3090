@@ -1,0 +1,94 @@
+{
+  "single": {
+    "short": {
+      "prompt": "short",
+      "runs": 3,
+      "avg_tokens_per_sec": 44.49270670412224,
+      "min_tokens_per_sec": 25.1129702007582,
+      "max_tokens_per_sec": 58.12586410031075,
+      "stddev": 17.240364540288827,
+      "details": [
+        {
+          "elapsed": 0.7565811550011858,
+          "prompt_tokens": 16,
+          "completion_tokens": 19,
+          "tokens_per_sec": 25.1129702007582
+        },
+        {
+          "elapsed": 0.32687686099961866,
+          "prompt_tokens": 16,
+          "completion_tokens": 19,
+          "tokens_per_sec": 58.12586410031075
+        },
+        {
+          "elapsed": 0.17914267399828532,
+          "prompt_tokens": 16,
+          "completion_tokens": 9,
+          "tokens_per_sec": 50.23928581129778
+        }
+      ]
+    },
+    "medium": {
+      "prompt": "medium",
+      "runs": 3,
+      "avg_tokens_per_sec": 67.51406527796256,
+      "min_tokens_per_sec": 67.4229508013026,
+      "max_tokens_per_sec": 67.59256436399944,
+      "stddev": 0.085507609153268,
+      "details": [
+        {
+          "elapsed": 3.796926668997912,
+          "prompt_tokens": 16,
+          "completion_tokens": 256,
+          "tokens_per_sec": 67.4229508013026
+        },
+        {
+          "elapsed": 3.791094090000115,
+          "prompt_tokens": 16,
+          "completion_tokens": 256,
+          "tokens_per_sec": 67.52668066858563
+        },
+        {
+          "elapsed": 3.787398841999675,
+          "prompt_tokens": 16,
+          "completion_tokens": 256,
+          "tokens_per_sec": 67.59256436399944
+        }
+      ]
+    },
+    "long": {
+      "prompt": "long",
+      "runs": 3,
+      "avg_tokens_per_sec": 65.5385265540339,
+      "min_tokens_per_sec": 64.61506737385629,
+      "max_tokens_per_sec": 66.08847841262688,
+      "stddev": 0.8045904621301054,
+      "details": [
+        {
+          "elapsed": 2.120248505001655,
+          "prompt_tokens": 216,
+          "completion_tokens": 137,
+          "tokens_per_sec": 64.61506737385629
+        },
+        {
+          "elapsed": 1.9519287340008304,
+          "prompt_tokens": 216,
+          "completion_tokens": 129,
+          "tokens_per_sec": 66.08847841262688
+        },
+        {
+          "elapsed": 1.5778605800005607,
+          "prompt_tokens": 216,
+          "completion_tokens": 104,
+          "tokens_per_sec": 65.91203387561849
+        }
+      ]
+    }
+  },
+  "batch": {
+    "batch_size": 4,
+    "runs": 2,
+    "avg_aggregate_throughput": 244.26135149691464,
+    "max_aggregate_throughput": 246.3862924314507
+  }
+}
