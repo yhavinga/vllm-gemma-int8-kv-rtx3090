@@ -18,8 +18,19 @@ import os
 
 _DEFAULT_TEXT_FILE = os.path.join(os.path.dirname(__file__), "dutch_parliament_text.txt")
 
-def load_dutch_text(filepath=None, max_chars=12000):
-    """Load Dutch parliamentary text from file, truncated to fit context."""
+def load_dutch_text(filepath=None, max_chars=None):
+    """Load Dutch parliamentary text from file, truncated to fit context.
+
+    Gemma 3 Dutch text ratio: ~3.94 chars/token
+
+    Recommended max_chars by context size:
+    - 8K context:   ~28,000 chars (~7K tokens, leaving room for prompt+output)
+    - 32K context:  ~110,000 chars (~28K tokens)
+    - 128K context: ~390,000 chars (~100K tokens)
+    """
+    if max_chars is None:
+        max_chars = 28000  # Safe default for 8K context
+
     path = filepath or _DEFAULT_TEXT_FILE
     if os.path.exists(path):
         with open(path, "r", encoding="utf-8") as f:
@@ -32,6 +43,13 @@ def load_dutch_text(filepath=None, max_chars=12000):
                     text = text[:last_period + 1]
             return text
     return None
+
+# Character limits by context size (Gemma 3, ~3.94 chars/token)
+CONTEXT_CHAR_LIMITS = {
+    8192: 28000,      # ~7K tokens input
+    32768: 110000,    # ~28K tokens input
+    131072: 390000,   # ~100K tokens input
+}
 
 DUTCH_PARLIAMENT_TEXT = load_dutch_text() or """
 [Fallback text if file not found]
@@ -116,13 +134,17 @@ def run_comparison(url: str, models: list[str], temperature: float = 0.3):
     return results
 
 
-def save_results(results: dict, filename: str):
+def save_results(results: dict, filename: str, text: str = None, context_size: int = 8192):
     """Save results to JSON file."""
+    text_preview = (text[:200] + "...") if text else "N/A"
     output = {
         "timestamp": datetime.now().isoformat(),
         "test": "Dutch parliamentary summarization",
+        "context_size": context_size,
+        "input_chars": len(text) if text else 0,
+        "input_tokens_est": int(len(text) / 3.94) if text else 0,
         "temperature": 0.3,
-        "input_text_preview": DUTCH_PARLIAMENT_TEXT[:200] + "...",
+        "input_text_preview": text_preview,
         "results": results,
     }
 
@@ -138,16 +160,28 @@ def main():
     parser.add_argument("--model", required=True, help="Model name to test")
     parser.add_argument("--temperature", type=float, default=0.3, help="Temperature (default: 0.3)")
     parser.add_argument("--output", default=None, help="Output JSON file")
+    parser.add_argument("--context", type=int, default=8192, choices=[8192, 32768, 131072],
+                        help="Context size: 8192, 32768, or 131072 (default: 8192)")
+    parser.add_argument("--max-chars", type=int, default=None,
+                        help="Max input chars (overrides --context calculation)")
     args = parser.parse_args()
+
+    # Determine max chars based on context size
+    max_chars = args.max_chars or CONTEXT_CHAR_LIMITS.get(args.context, 28000)
+
+    # Reload text with appropriate limit
+    text = load_dutch_text(max_chars=max_chars)
+    estimated_tokens = len(text) / 3.94
 
     print("=" * 60)
     print("Dutch Parliamentary Text Summarization Test")
     print("=" * 60)
     print(f"Model: {args.model}")
+    print(f"Context size: {args.context:,} tokens")
     print(f"Temperature: {args.temperature}")
-    print(f"Input text: {len(DUTCH_PARLIAMENT_TEXT)} characters")
+    print(f"Input text: {len(text):,} characters (~{int(estimated_tokens):,} tokens)")
 
-    prompt = SUMMARIZATION_PROMPT.format(text=DUTCH_PARLIAMENT_TEXT)
+    prompt = SUMMARIZATION_PROMPT.format(text=text)
 
     try:
         result = query_model(args.url, args.model, prompt, args.temperature)
@@ -159,7 +193,7 @@ def main():
         print(f"\n{result['content']}")
 
         if args.output:
-            save_results({args.model: result}, args.output)
+            save_results({args.model: result}, args.output, text=text, context_size=args.context)
 
         return result
 
