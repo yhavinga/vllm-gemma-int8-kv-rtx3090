@@ -1,0 +1,15 @@
+{
+  "timestamp": "2026-03-15T12:32:44.841685",
+  "test": "Dutch parliamentary summarization",
+  "temperature": 0.3,
+  "input_text_preview": "\nVoorzitter. De minister-president heeft zojuist een verklaring afgelegd over de klimaatmaatregelen\ndie het kabinet voornemens is te nemen in de komende jaren. Ik wil hier namens mijn fractie\nreageren...",
+  "results": {
+    "ISTA-DASLab/gemma-3-27b-it-GPTQ-4b-128g": {
+      "content": "## Samenvatting Parlementaire Bijdrage Klimaatmaatregelen\n\n**1. Hoofdpunten:**\n\n*   De CO2-heffing voor de industrie wordt als noodzakelijk gezien, maar er zijn zorgen over de concurrentiepositie van Nederlandse bedrijven.\n*   De verhoging van de aanschafsubsidie voor elektrische voertuigen wordt toegejuichd, maar mogelijk onvoldoende om de doelstelling van 1,9 miljoen elektrische auto's in 2030 te halen.\n*   De investering in woningisolatie wordt als onvoldoende beschouwd gezien de omvang van de opgave en het tekort aan vakmensen.\n*   Er is behoefte aan structurele maatregelen om energie-armoede te bestrijden, naast de tijdelijke energietoeslag.\n\n**2. Vragen aan de minister:**\n\n1.  Kan de minister toezeggen dat er voor 1 maart een uitgewerkt plan ligt voor de compensatiemaatregelen rondom de CO2-heffing voor de industrie?\n2.  Welke aanvullende maatregelen overweegt het kabinet om het tempo van elektrificatie te versnellen en de doelstelling van 1,9 miljoen elektrische auto's in 2030 te halen?\n3.  Hoe denkt de minister het capaciteitsprobleem in de isolatiebranche, met een tekort van naar schatting 40.000 vakmensen, op te lossen?\n\n**3. Standpunt fractie:**\n\nDe fractie steunt de algemene richting van het kabinetsbeleid op het gebied van klimaatmaatregelen, maar is bezorgd over de uitwerking en de impact op de concurrentiepositie, de haalbaarheid van de doelstellingen en de sociale aspecten van de energietransitie.\n\n**4. Toon:**\n\nConstructief.\n",
+      "prompt_tokens": 835,
+      "completion_tokens": 417,
+      "elapsed": 7.0599488469997596,
+      "tokens_per_sec": 59.06558376513039
+    }
+  }
+}
