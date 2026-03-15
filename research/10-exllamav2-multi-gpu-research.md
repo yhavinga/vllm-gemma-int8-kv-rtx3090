@@ -246,34 +246,119 @@ For dual RTX 3090 with tensor_parallel:
 
 ---
 
-## Performance Comparison: vLLM vs ExLlamaV2
+## Performance Comparison: vLLM vs ExLlamaV2 vs ExLlamaV3
 
 ### MEASURED RESULTS (2026-03-15)
 
-| Backend | Mode | Single tok/s | Notes |
-|---------|------|--------------|-------|
-| **vLLM W4A16** | **TP=2** | **67.5** | Tensor parallelism works |
-| ExLlamaV2 EXL2 4bpw | gpu_split | **42** | **TP NOT SUPPORTED** |
+| Backend | Mode | Single tok/s | VRAM Usage | Notes |
+|---------|------|--------------|------------|-------|
+| **vLLM W4A16** | **TP=2** | **67.5** | ~22GB/GPU | Tensor parallelism, CUDA graphs |
+| **ExLlamaV3 EXL3 4bpw** | **TP=2** | **43.7** | **~40%/GPU** | **WORKS!** Tensor parallelism |
+| ExLlamaV2 EXL2 4bpw | gpu_split | 42 | 17GB GPU0 | TP NOT supported |
+| ExLlamaV3 EXL3 4bpw | No TP | 28.6 | 16.8GB GPU0 | Single GPU baseline |
 
-**vLLM is 60% faster than ExLlamaV2 for Gemma 3 27B!**
+### Key Findings
 
-### Critical Discovery: No Tensor Parallelism for Gemma 3
+1. **vLLM is still 54% faster** than ExLlamaV3 with tensor parallelism
+2. **ExLlamaV3 TP works!** Both GPUs active, ~40% VRAM each (~9.5GB per GPU)
+3. **ExLlamaV3 TP provides 53% speedup** over single GPU (43.7 vs 28.6 tok/s)
+4. **ExLlamaV2 has NO TP for Gemma 3** - only layer distribution (gpu_split)
 
+### ExLlamaV3 Setup Notes
+
+**Critical fixes required:**
+1. Use `Model.from_config(config)` not `Model(config)`
+2. Create `Cache(model, ...)` BEFORE calling `model.load()`
+3. Use proper Gemma 3 chat format: `<start_of_turn>user\n...<end_of_turn>\n<start_of_turn>model\n`
+4. Add `add_bos=True` to generate calls
+
+**Example working code:**
+```python
+from exllamav3 import Model, Config, Cache, Tokenizer, DefaultSampler
+from exllamav3.generator import Generator
+
+config = Config.from_directory(model_dir)
+model = Model.from_config(config)  # NOT Model(config)!
+cache = Cache(model, max_num_tokens=8192)  # BEFORE model.load()!
+model.load(tensor_p=True)  # Enable tensor parallelism
+tokenizer = Tokenizer(config)
+generator = Generator(model, cache, tokenizer)
+
+prompt = "<start_of_turn>user\nHello<end_of_turn>\n<start_of_turn>model\n"
+output = generator.generate(prompt, sampler=DefaultSampler(), max_new_tokens=256, add_bos=True)
 ```
-AssertionError: Tensor-parallel is NOT supported for Gemma3ForConditionalGeneration
+
+### Long Context Performance (ExLlamaV3 EXL3 4bpw, TP=2)
+
+| Context | Prompt Tokens | Prefill Time | Prefill Speed | Gen Time (256 tok) |
+|---------|---------------|--------------|---------------|-------------------|
+| 8K | 2,335 | ~2.4s | 960 tok/s | 8.2s |
+| 32K | 8,399 | ~6.0s | 1,400 tok/s | 11.8s |
+| 64K | 15,517 | ~7.3s | 2,117 tok/s | 13.2s |
+| 128K | - | **OOM** | - | - |
+
+**Key findings:**
+- 64K context is the practical maximum (model + FP16 cache uses ~22GB per GPU)
+- 128K causes OOM even with tensor parallelism
+- Prefill throughput scales well (higher efficiency at longer contexts)
+- Generation remains stable at ~44 tok/s regardless of context length
+
+### Context-Dependent Performance Comparison
+
+| Context | Prompt Tokens | vLLM W4A16 | ExLlamaV3 EXL3 | Winner |
+|---------|---------------|------------|----------------|--------|
+| **8K (short)** | ~2K | **67 tok/s** | 44 tok/s | vLLM (+52%) |
+| **32K** | ~8K | ~35 tok/s | **44 tok/s** | ExLlamaV3 (+26%) |
+| **64K (full text)** | ~33K | **21 tok/s** | 15.5 tok/s | vLLM (+35%) |
+| **128K** | ~33K | **21 tok/s** | OOM | vLLM (only option) |
+
+**Key insight:** At short-medium contexts (up to ~16K tokens), ExLlamaV3 maintains ~44 tok/s. But at full 33K token prompts, ExLlamaV3 drops to 15.5 tok/s while vLLM achieves 21 tok/s. vLLM wins at both extremes (short and very long context).
+
+### Quality Comparison: Dutch Parliamentary Summarization
+
+Both models tested on 128,922 character Dutch parliamentary debate (~33K tokens):
+
+| Aspect | vLLM W4A16 | ExLlamaV3 EXL3 |
+|--------|------------|----------------|
+| **Summary scope** | Single speaker (De Boer) | **Full debate (5 speakers)** |
+| **Structure** | 4 sections, 8 questions | 6 topics, party positions |
+| **Comprehensiveness** | Focused | **Broader overview** |
+| **Speed** | **21 tok/s** | 15.5 tok/s |
+| **Context handled** | **Full 128K** | 64K (OOM at 128K) |
+
+**vLLM output (focused on GroenLinks/De Boer):**
+```
+## Samenvatting Parlementaire Bijdrage - De Boer (GroenLinks)
+1. Hoofdpunten: complexiteit fiscale systeem, langetermijnvisie nodig
+2. Vragen aan de minister: 8 specific questions
+3. Standpunt fractie: eerlijk en duurzaam fiscaal beleid
+4. Toon: Kritisch
 ```
 
-ExLlamaV2 only supports `gpu_split` (layer distribution) for Gemma 3, not true tensor parallelism. This means:
-- GPU 0 processes layers 0-19, then passes to GPU 1
-- GPU 1 processes layers 20-39
-- **Sequential, not parallel** - one GPU waits while the other works
+**ExLlamaV3 output (full debate overview):**
+```
+## Samenvatting debat begroting Financiën 1995
+1. Hoofdonderwerpen: Budgettaire discipline, Belastingplan, Brede Herwaardering,
+   Werknemersspaarregelingen, Vermogensbelasting, Europese Integratie
+2. Sprekers: PvdA (Schinck), CDA (Stevens), GroenLinks (De Boer), SGP (Barendregt)
+```
 
-### Why vLLM Wins
+**Quality verdict:** ExLlamaV3 produced a more comprehensive multi-speaker summary, while vLLM focused deeply on one speaker. Both are valid approaches depending on use case.
 
-1. **True tensor parallelism**: Both GPUs work simultaneously on each layer
-2. **NVLink utilization**: vLLM uses NVLink for inter-GPU communication
-3. **CUDA graphs**: Our optimized config (`FULL_DECODE_ONLY`) is proven
-4. **Marlin kernels**: Already excellent for W4A16 quantization
+### When to Use Each
+
+**Use vLLM when:**
+- Short context (<8K) - 67 tok/s is 3x faster
+- Need 128K context - only option that works
+- Batching multiple requests - vLLM excels here
+- Simpler setup preferred
+- Full-context long documents (~33K+ tokens)
+
+**Use ExLlamaV3 when:**
+- Medium context (8K-16K tokens) - competitive speed
+- Lower VRAM needed (~40%/GPU vs 90%/GPU)
+- Want EXL3 quantization (potentially better quality)
+- More comprehensive multi-speaker summaries preferred
 
 ---
 
@@ -381,24 +466,31 @@ print(output)
 
 ### Current State (March 2026)
 
-| Factor | vLLM | ExLlamaV2 |
-|--------|------|-----------|
-| Gemma 3 support | **Excellent** | Buggy |
-| Multi-GPU TP | **Proven** | Experimental |
-| All sizes available | **Yes** | 27B only |
-| Performance | **67 tok/s** | ~50-70 (estimated) |
-| Stability | **High** | Issues reported |
+| Factor | vLLM W4A16 | ExLlamaV2 EXL2 | ExLlamaV3 EXL3 |
+|--------|------------|----------------|----------------|
+| Gemma 3 support | **Excellent** | Buggy (no TP) | **Working** |
+| Multi-GPU TP | **Yes** | No (Gemma 3) | **Yes** |
+| Short context (8K) | **67 tok/s** | 42 tok/s | 44 tok/s |
+| Long context (33K) | **21 tok/s** | - | 15.5 tok/s |
+| Max context | **128K** | 64K | 64K |
+| Summary quality | Focused | - | **Comprehensive** |
+| Setup complexity | Simple | Medium | Complex |
 
-### Verdict
+### Final Verdict
 
-**Stay with vLLM for Gemma 3 on dual RTX 3090 with NVLink.**
+**For Gemma 3 27B on dual RTX 3090 with NVLink:**
 
-ExLlamaV2/V3 are excellent for other models (Llama 3, Mistral, Qwen) but the Gemma 3 implementation has unresolved bugs. The lack of quantized models for 1B/4B/12B sizes makes it impractical for smaller Gemma 3 variants.
+1. **Short prompts (<8K):** Use **vLLM** - 67 tok/s is unbeatable
+2. **Long context (128K):** Use **vLLM** - only option that works
+3. **Medium context (8K-32K):** **Either** works well
+4. **Best summary quality:** **ExLlamaV3** produced more comprehensive output
 
-Consider revisiting ExLlamaV3 (EXL3 format) once:
-1. Gemma 3 bugs are fixed
-2. Official turboderp quants exist for 1B/4B/12B
-3. TabbyAPI tensor parallelism is stable
+**Recommended default: vLLM** for simplicity and 128K support.
+
+**ExLlamaV3 is a viable alternative** now that tensor parallelism works for Gemma 3. Consider it for:
+- Lower VRAM requirements
+- EXL3 quantization benefits
+- When 64K context is sufficient
 
 ---
 
