@@ -11,41 +11,30 @@ from datetime import datetime
 
 import requests
 
-# Dutch parliamentary text sample (Tweede Kamer debate excerpt)
-DUTCH_PARLIAMENT_TEXT = """
-Voorzitter. De minister-president heeft zojuist een verklaring afgelegd over de klimaatmaatregelen
-die het kabinet voornemens is te nemen in de komende jaren. Ik wil hier namens mijn fractie
-reageren op deze plannen.
+# Load Dutch parliamentary text from file or use default
+# Source: https://zoek.officielebekendmakingen.nl/h-ek-19941995-11-382-402.html
+# Eerste Kamer debate, December 20, 1994 - Mr. Schinck (PvdA) on tax legislation
+import os
 
-Ten eerste, de voorgestelde CO2-heffing voor de industrie. Wij zijn van mening dat deze heffing
-weliswaar noodzakelijk is voor de transitie naar een duurzame economie, maar wij maken ons
-ernstige zorgen over de concurrentiepositie van Nederlandse bedrijven ten opzichte van hun
-buitenlandse concurrenten. De minister heeft aangegeven dat er compensatieregelingen komen,
-maar de details hiervan zijn nog onduidelijk. Kan de minister toezeggen dat er voor 1 maart
-een uitgewerkt plan ligt voor deze compensatiemaatregelen?
+_DEFAULT_TEXT_FILE = os.path.join(os.path.dirname(__file__), "dutch_parliament_text.txt")
 
-Ten tweede, de subsidieregeling voor elektrische voertuigen. Het kabinet stelt voor om de
-aanschafsubsidie te verhogen van 4.000 naar 5.500 euro. Hoewel wij deze maatregel toejuichen,
-vragen wij ons af of dit voldoende is om de doelstelling van 1,9 miljoen elektrische auto's
-in 2030 te halen. Uit berekeningen van het Planbureau voor de Leefomgeving blijkt dat het
-huidige tempo van elektrificatie onvoldoende is. Welke aanvullende maatregelen overweegt
-het kabinet?
+def load_dutch_text(filepath=None, max_chars=12000):
+    """Load Dutch parliamentary text from file, truncated to fit context."""
+    path = filepath or _DEFAULT_TEXT_FILE
+    if os.path.exists(path):
+        with open(path, "r", encoding="utf-8") as f:
+            text = f.read()
+            if len(text) > max_chars:
+                # Truncate at sentence boundary
+                text = text[:max_chars]
+                last_period = text.rfind('.')
+                if last_period > max_chars * 0.8:
+                    text = text[:last_period + 1]
+            return text
+    return None
 
-Ten derde, de woningisolatie. Het kabinet trekt 1,2 miljard euro uit voor de isolatie van
-bestaande woningen. Dit is een aanzienlijk bedrag, maar gezien de opgave van 7 miljoen te
-isoleren woningen, lijkt dit onvoldoende. Bovendien zijn er grote zorgen over de capaciteit
-in de bouwsector. Er is een tekort van naar schatting 40.000 vakmensen in de isolatiebranche.
-Hoe denkt de minister dit capaciteitsprobleem op te lossen?
-
-Tot slot wil ik aandacht vragen voor de sociale aspecten van de energietransitie. De stijgende
-energiekosten raken met name huishoudens met lagere inkomens. Het kabinet heeft weliswaar
-een energietoeslag aangekondigd, maar deze is tijdelijk van aard. Wij pleiten voor structurele
-maatregelen om energie-armoede te bestrijden. Denk hierbij aan gerichte subsidies voor
-woningisolatie in achterstandswijken en een sociaal energietarief voor minima.
-
-Voorzitter, ik rond af. De klimaatopgave is immens en vraagt om daadkrachtig beleid. Wij
-steunen de richting die het kabinet inslaat, maar hebben nog veel vragen over de uitwerking.
-Ik zie uit naar de antwoorden van de minister.
+DUTCH_PARLIAMENT_TEXT = load_dutch_text() or """
+[Fallback text if file not found]
 """
 
 SUMMARIZATION_PROMPT = """Je bent een ervaren parlementair journalist die gespecialiseerd is in het samenvatten van Kamerdebatten.

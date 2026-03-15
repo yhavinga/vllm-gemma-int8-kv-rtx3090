@@ -1,0 +1,15 @@
+{
+  "timestamp": "2026-03-15T12:42:54.480894",
+  "test": "Dutch parliamentary summarization",
+  "temperature": 0.3,
+  "input_text_preview": "Aan de orde is de behandeling van de wetsvoorstellen:\n\nVaststelling van de begroting van de uitgaven en de ontvangsten van de Nationale Schuld (IXA) voor het jaar 1995 (23900-IXA);\n\nWijziging van hoof...",
+  "results": {
+    "RedHatAI/gemma-3-27b-it-quantized.w4a16": {
+      "content": "## Samenvatting Parlementaire Bijdrage Schinck (PvdA) – Begroting IXA/IXB & Fiscale Voorstellen 1995\n\n**1. Hoofdpunten:**\n\n*   De PvdA ziet weinig controversiële punten in het fiscale pakket, maar acht verdere discussie over de ouderenaftrek en de werknemersspaarregeling noodzakelijk.\n*   De PvdA betwijfelt of de ouderenaftrek het meest effectieve middel is om de koopkracht van ouderen te verbeteren en pleit voor een mogelijke verhoging van de AOW.\n*   De PvdA wijst op de onwenselijkheid van een absolute inkomensgrens bij de ouderenaftrek, die tot een marginale belastingdruk van boven de 100% kan leiden.\n*   De PvdA is kritisch over de besluitvorming rondom de werknemersspaarregeling, waarbij onvoldoende rekening werd gehouden met alle fiscale effecten (vennootschapsbelasting, werkgelegenheid).\n\n**2. Vragen aan de minister:**\n\n1.  Is een verhoging van de AOW niet een directere en effectievere manier om de koopkracht van senioren te verbeteren dan de introductie van een ouderenaftrek?\n2.  Waarom is het niet mogelijk om de ouderenaftrek te richten op de meest kwetsbare groep ouderen (uitsluitend AOW-inkomen of een klein inkomen daarboven)?\n3.  Is de ouderenaftrek niet een ad hoc maatregel, gezien het feit dat de vorm van de inkomensondersteuning nog wordt bestudeerd?\n4.  Heeft het kabinet voldoende rekening gehouden met de gestapelde effecten van eigen bijdragen en gemeentelijke heffingen op de koopkracht van ouderen?\n5.  Is de besluitvorming rondom de werknemersspaarregeling niet gebaseerd op een te smalle beoordeling van de fiscale effecten, waarbij de meevaller in de vennootschapsbelasting onvoldoende werd meegenomen?\n\n**3. Standpunt fractie:**\n\nDe PvdA ziet in de voorgestelde fiscale maatregelen weinig aanleiding tot grote bezwaren, maar benadrukt het belang van een integrale benadering en een zorgvuldige afweging van alle effecten, met name bij maatregelen die gericht zijn op kwetsbare groepen als ouderen.\n\n**4. Toon:**\n\nKritisch.\n",
+      "prompt_tokens": 3473,
+      "completion_tokens": 570,
+      "elapsed": 10.870766104000722,
+      "tokens_per_sec": 52.4342069865918
+    }
+  }
+}

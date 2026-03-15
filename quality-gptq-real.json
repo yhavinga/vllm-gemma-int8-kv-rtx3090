@@ -1,0 +1,15 @@
+{
+  "timestamp": "2026-03-15T12:46:07.574274",
+  "test": "Dutch parliamentary summarization",
+  "temperature": 0.3,
+  "input_text_preview": "Aan de orde is de behandeling van de wetsvoorstellen:\n\nVaststelling van de begroting van de uitgaven en de ontvangsten van de Nationale Schuld (IXA) voor het jaar 1995 (23900-IXA);\n\nWijziging van hoof...",
+  "results": {
+    "ISTA-DASLab/gemma-3-27b-it-GPTQ-4b-128g": {
+      "content": "## Samenvatting Parlementaire Bijdrage Schinck (PvdA) - Begrotingsbehandeling Belastingwetgeving 1995\n\n**1. Hoofdpunten:**\n\n*   De voorgestelde fiscale voorstellen zijn grotendeels zonder grote controverses tot stand gekomen.\n*   De PvdA heeft specifieke bezwaren bij de ouderenaftrek, met name de effectiviteit en de grens van de aftrek.\n*   De werknemersspaarregeling is mogelijk gebaseerd op een te beperkte analyse van de totale fiscale effecten.\n*   Er is behoedzaamheid ten aanzien van de koopkrachteffecten van diverse maatregelen, inclusief de stapeling van lasten voor ouderen.\n\n**2. Vragen aan de minister:**\n\n1.  Is een verhoging van de AOW niet een effectievere en eenvoudigere manier om de koopkracht van ouderen te verbeteren dan de introductie van een aftrek?\n2.  Waarom is de inkomensgrens voor de ouderenaftrek absoluut, waardoor een kleine inkomensstijging kan leiden tot een lager netto inkomen?\n3.  Is de ouderenaftrek een structurele maatregel, of slechts tijdelijk van aard en afhankelijk van de beschikbaarheid van middelen in het regeerakkoord?\n4.  Is er in de overwegingen rond de werknemersspaarregeling voldoende rekening gehouden met de effecten op de werkgelegenheid en de vennootschapsbelasting, naast de inkomstenbelasting?\n5.  Hoe wordt de stapeling van lasten (eigen bijdragen, gemeentelijke heffingen, WVG) voor ouderen in het beleid meegenomen en gecompenseerd?\n\n**3. Standpunt fractie:**\n\nDe PvdA respecteert de afspraken in het regeerakkoord, maar is kritisch over de vormgeving van de ouderenaftrek en de werknemersspaarregeling, waarbij een bredere afweging van fiscale effecten en koopkrachteffecten wenselijk is.\n\n**4. Toon:**\n\nKritisch.\n",
+      "prompt_tokens": 3473,
+      "completion_tokens": 486,
+      "elapsed": 9.511695389001034,
+      "tokens_per_sec": 51.09499202024406
+    }
+  }
+}
