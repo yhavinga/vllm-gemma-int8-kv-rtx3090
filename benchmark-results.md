@@ -31,6 +31,22 @@ vllm serve RedHatAI/gemma-3-27b-it-quantized.w4a16 \
 
 ---
 
+## Context Length Scaling
+
+All context sizes work with CUDA graphs and achieve similar performance:
+
+| Context | Launch Script | GPU Mem Util | Single tok/s | Batch tok/s |
+|---------|---------------|--------------|--------------|-------------|
+| 8K      | `launch-optimized.sh` | 0.90 | 67 | 244 |
+| 32K     | `launch-optimized-32k.sh` | 0.90 | 67 | 243 |
+| 128K    | `launch-optimized-128k.sh` | 0.95 | 67 | 241 |
+
+**Key insight:** W4A16 quantization enables full 128K context on dual RTX 3090 with no speed loss!
+
+See `research-context-scaling.md` for detailed memory analysis.
+
+---
+
 ## System Configuration
 
 | Component | Value |
