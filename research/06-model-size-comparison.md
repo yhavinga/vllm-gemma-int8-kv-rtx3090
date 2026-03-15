@@ -12,16 +12,20 @@
 
 | Model | Quant | GPU Config | Single tok/s | Batch(4) tok/s |
 |-------|-------|------------|--------------|----------------|
-| **1B** | W8A8 | 1x GPU | **268.8** | **898.5** |
-| **4B** | W4A16 | 1x GPU | **176.2** | **581** |
-| **4B** | W4A16 | 2x GPU (TP=2) | **212.3** | **675** |
-| **12B** | W4A16 | 1x GPU | **83.0** | **301.3** |
-| **12B** | W4A16 | 2x GPU (TP=2) | **115.4** | **394.2** |
-| **27B** | W4A16 | 2x GPU (TP=2) | **67.5** | **244.3** |
+| **1B** | W8A8 | 1x GPU | **263** | **887** |
+| **1B** | W8A8 | 2x GPU (TP=2) | **298** | **948** |
+| **4B** | W4A16 | 1x GPU | **176** | **581** |
+| **4B** | W4A16 | 2x GPU (TP=2) | **212** | **675** |
+| **12B** | W4A16 | 1x GPU | **83** | **301** |
+| **12B** | W4A16 | 2x GPU (TP=2) | **115** | **394** |
+| **27B** | W4A16 | 2x GPU (TP=2) | **67.5** | **244** |
 
 **Tensor Parallelism Speedups:**
+- 1B TP=2: **+13%** faster than TP=1. See [09-1b-tensor-parallel-comparison.md](09-1b-tensor-parallel-comparison.md).
 - 4B TP=2: **+20%** faster than TP=1. See [08-4b-tensor-parallel-comparison.md](08-4b-tensor-parallel-comparison.md).
 - 12B TP=2: **+39%** faster than TP=1. See [07-12b-tensor-parallel-comparison.md](07-12b-tensor-parallel-comparison.md).
+
+**Key Insight:** Larger models benefit more from TP=2 (39% > 20% > 13%).
 
 ### Recommendation: RedHatAI W4A16 for Most Use Cases
 
