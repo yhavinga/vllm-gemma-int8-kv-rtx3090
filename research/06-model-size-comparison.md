@@ -13,12 +13,15 @@
 | Model | Quant | GPU Config | Single tok/s | Batch(4) tok/s |
 |-------|-------|------------|--------------|----------------|
 | **1B** | W8A8 | 1x GPU | **268.8** | **898.5** |
-| **4B** | W4A16 | 1x GPU | **177.4** | **606.3** |
+| **4B** | W4A16 | 1x GPU | **176.2** | **581** |
+| **4B** | W4A16 | 2x GPU (TP=2) | **212.3** | **675** |
 | **12B** | W4A16 | 1x GPU | **83.0** | **301.3** |
 | **12B** | W4A16 | 2x GPU (TP=2) | **115.4** | **394.2** |
 | **27B** | W4A16 | 2x GPU (TP=2) | **67.5** | **244.3** |
 
-**NEW:** 12B with TP=2 is **39% faster** than TP=1! See [07-12b-tensor-parallel-comparison.md](07-12b-tensor-parallel-comparison.md).
+**Tensor Parallelism Speedups:**
+- 4B TP=2: **+20%** faster than TP=1. See [08-4b-tensor-parallel-comparison.md](08-4b-tensor-parallel-comparison.md).
+- 12B TP=2: **+39%** faster than TP=1. See [07-12b-tensor-parallel-comparison.md](07-12b-tensor-parallel-comparison.md).
 
 ### Recommendation: RedHatAI W4A16 for Most Use Cases
 
