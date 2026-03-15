@@ -1,0 +1,18 @@
+{
+  "timestamp": "2026-03-15T13:19:01.088826",
+  "test": "Dutch parliamentary summarization",
+  "context_size": 131072,
+  "input_chars": 128922,
+  "input_tokens_est": 32721,
+  "temperature": 0.3,
+  "input_text_preview": "Aan de orde is de behandeling van de wetsvoorstellen:\n\nVaststelling van de begroting van de uitgaven en de ontvangsten van de Nationale Schuld (IXA) voor het jaar 1995 (23900-IXA);\n\nWijziging van hoof...",
+  "results": {
+    "RedHatAI/gemma-3-27b-it-quantized.w4a16": {
+      "content": "## Samenvatting Parlementaire Bijdrage - De Boer (GroenLinks)\n\n**1. Hoofdpunten:**\n\n*   De spreker benadrukt de complexiteit van het fiscale systeem en de noodzaak van een langetermijnvisie, kritisch op ad-hoc maatregelen.\n*   Er is bezorgdheid over de budgettaire neutraliteit en de impact van fiscale beslissingen op specifieke groepen (ouderen, werknemers).\n*   De spreker pleit voor een heroverweging van de basisinkomsten en een meer gelijkmatige verdeling van de lasten.\n*   Er wordt kritiek geleverd op de snelheid van wetsvoorstellen en de mogelijke negatieve gevolgen voor de kwaliteit van de wetgeving.\n\n**2. Vragen aan de minister:**\n\n1.  Wat is de visie van de minister op de verhouding tussen belasting en premie in de eerste schijf, en welke norm wordt gehanteerd voor een evenwichtige verdeling?\n2.  Hoe beoordeelt de minister de impact van de afschaffing van de renteaftrek op consumptief krediet en welke maatregelen worden overwogen om negatieve gevolgen te beperken?\n3.  Welke prioriteiten worden gesteld binnen het paarse fiscale beleid voor de komende jaren, en is er een duidelijke lange-termijnstrategie?\n4.  Hoe ziet de minister de relatie tussen de Europese fiscale regelgeving en de nationale fiscale autonomie, en welke rol speelt Nederland in de discussie over harmonisatie?\n5.  Wat is de positie van de regering ten opzichte van de kritiek op de hoogte van de Nederlandse bijdrage aan de Europese Unie?\n6.  Hoe wordt de impact van de werknemersspaarregeling op de werkgelegenheid en de loonkosten beoordeeld, en welke maatregelen worden overwogen om budgettaire problemen op te lossen?\n7.  Welke visie heeft de minister op de invoering van een basisinkomen en welke voor- en nadelen ziet hij?\n\n**3. Standpunt fractie:**\n\nGroenLinks benadrukt het belang van een eerlijk en duurzaam fiscaal beleid, met aandacht voor de verdeling van lasten en de bescherming van kwetsbare groepen. De fractie is kritisch op ad-hoc maatregelen en pleit voor een langetermijnvisie.\n\n**4. Toon:**\n\nKritisch.\n",
+      "prompt_tokens": 32960,
+      "completion_tokens": 546,
+      "elapsed": 10.407271624999339,
+      "tokens_per_sec": 52.46331792556002
+    }
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "timestamp": "2026-03-15T13:17:01.714162",
+  "test": "Dutch parliamentary summarization",
+  "context_size": 131072,
+  "input_chars": 128922,
+  "input_tokens_est": 32721,
+  "temperature": 0.3,
+  "input_text_preview": "Aan de orde is de behandeling van de wetsvoorstellen:\n\nVaststelling van de begroting van de uitgaven en de ontvangsten van de Nationale Schuld (IXA) voor het jaar 1995 (23900-IXA);\n\nWijziging van hoof...",
+  "results": {
+    "RedHatAI/gemma-3-27b-it-quantized.w4a16": {
+      "content": "## Samenvatting Parlementaire Bijdrage - Heer Schuyer (D66) - 1995\n\n**1. Hoofdpunten:**\n\n*   **Budgettaire discipline & EU-beleid:** Bezorgdheid over de stijgende Nederlandse bijdrage aan de EU en de noodzaak van een streng budgetbeleid, ook gezien de toetreding tot de EMU.\n*   **Vereenvoudiging & Consistentie:** Pleidooi voor een eenvoudiger en consistenter fiscaal beleid, kritiek op ad-hoc maatregelen en het zigzag-beleid rondom werknemersspaarregelingen.\n*   **Brede Herwaardering:** Positief over de verbeterde uitwerking van de Brede Herwaardering II & III, maar benadrukt het belang van duidelijke regels en het tegengaan van oneigenlijk gebruik.\n*   **Fiscale Concurrentie & Vermogensbelasting:** Aandacht voor de achterblijdende internationale fiscale concurrentiepositie en pleit voor een geleidelijke afschaffing van de vermogensbelasting.\n\n**2. Vragen aan de minister:**\n\n1.  Heeft de minister zijn toetreding tot het kabinet afhankelijk gemaakt van de ruimte voor financiële sanering?\n2.  Wat zijn de voordelen van de nieuwe norm voor uitgaven (Zalm-norm) en gelden deze voor alle vier pijlers van het beleid?\n3.  Wat is de reden voor de stijgende Nederlandse bijdragen aan de EU en welke mogelijkheden zijn er om dit tegen te gaan?\n4.  Wat is de positie van de minister ten opzichte van de kritiek van DNB op het financiële beleid en de afwijzing van het Nederlandse standpunt door de Ecofin?\n5.  Hoe ziet de minister de relatie tussen de fiscale behandeling van pensioenen en de Pensioen- en spaarfondsenwet?\n6.  Wat is de visie op de afschaffing van de rente-aftrek op consumptieve leningen en welke gevolgen verwacht hij hiervan?\n7.  Hoe zal de minister omgaan met de moties van de Tweede Kamer over de werknemersspaarregelingen?\n8.  Wat is de visie op de private financiering van overheidsgebouwen en welke criteria worden gehanteerd?\n9.  Hoe zal de minister de fiscale concurrentiepositie van Nederland versterken?\n\n**3. Standpunt fractie:**\n\nD66 benadrukt het belang van een zorgvuldig en consistent fiscaal beleid gericht op budgettaire discipline en het bevorderen van de economische groei. De fractie is kritisch op ad-hoc maatregelen en pleit voor vereenvoudiging en duidelijkheid in de wetgeving.\n\n**4. Toon:**\n\nAnalytisch.",
+      "prompt_tokens": 32960,
+      "completion_tokens": 624,
+      "elapsed": 12.059734607000792,
+      "tokens_per_sec": 51.74243217904331
+    }
+  }
+}

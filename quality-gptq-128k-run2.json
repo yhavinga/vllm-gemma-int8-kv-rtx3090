@@ -1,0 +1,18 @@
+{
+  "timestamp": "2026-03-15T13:14:08.736090",
+  "test": "Dutch parliamentary summarization",
+  "context_size": 131072,
+  "input_chars": 128922,
+  "input_tokens_est": 32721,
+  "temperature": 0.3,
+  "input_text_preview": "Aan de orde is de behandeling van de wetsvoorstellen:\n\nVaststelling van de begroting van de uitgaven en de ontvangsten van de Nationale Schuld (IXA) voor het jaar 1995 (23900-IXA);\n\nWijziging van hoof...",
+  "results": {
+    "ISTA-DASLab/gemma-3-27b-it-GPTQ-4b-128g": {
+      "content": "## Samenvatting Parlementaire Bijdrage - De Boer (GroenLinks) & Hilarides (VVD)\n\n**Datum:** 1995\n**Onderwerp:** Behandeling wetsvoorstellen betreffende de begroting van Financiën en diverse fiscale voorstellen.\n\n**1. Hoofdpunten:**\n\n*   **Sanering overheidsfinanciën:** Beide sprekers benadrukken het belang van een gezonde overheidsfinanciën en steunen het kabinet in de inspanningen om de schuld te verminderen.\n*   **Budgettaire discipline:** Er is zorg over de budgettaire neutraliteit van bepaalde maatregelen, zoals de werknemersspaarregeling, en de noodzaak om meevallers te gebruiken voor schuldafbouw.\n*   **Internationale fiscale concurrentie:** De noodzaak om de fiscale positie van Nederland te verbeteren in een internationale context wordt benadrukt.\n*   **Vereenvoudiging & Duidelijkheid:** Beide fracties pleiten voor een vereenvoudiging van de fiscale wetgeving en een duidelijke uitleg van de regels.\n\n**2. Vragen aan de minister(s):**\n\n*   **De Boer:**\n    1.  Hoe ziet de minister de lange termijn visie op het fiscale beleid?\n    2.  Hoe wordt de spanning tussen de eerste en tweede schijf van de inkomstenbelasting aangepakt?\n    3.  Wat is de visie op de afschaffing van de aftrek van consumptieve rente en de mogelijke gevolgen voor hypotheken?\n    4.  Hoe wordt de discussie over een basisinkomen aangepakt?\n    5.  Wat is de rol van de EU bij de financiering van werkloosheidsprojecten?\n*   **Hilarides:**\n    1.  Hoe wordt de budgettaire neutraliteit van de werknemersspaarregeling gewaarborgd?\n    2.  Wat is de visie op de afschaffing van de vermogensbelasting?\n    3.  Hoe wordt de relatie tussen de Nederlandse en Europese financiële afdrachten beoordeeld?\n    4.  Hoe wordt de afhankelijkheid van de overheid van lease-contracten verminderd?\n    5.  Hoe wordt de fiscale positie van Nederland in de internationale context verbeterd?\n\n**3. Standpunt fractie:**\n\n*   **GroenLinks (De Boer):** Ondersteunt de inspanningen voor een gezonde overheidsfinanciën, maar benadrukt de noodzaak van een eerlijke verdeling van de lasten en aandacht voor de gevolgen van beleid voor kwetsbare groepen.\n*   **VVD (Hilarides):** Steunt de sanering van de overheidsfinanciën en de bevordering van de werkgelegenheid, met nadruk op budgettaire discipline en een aantrekkelijke fiscale positie voor Nederland.\n\n**4. Toon:**\n\n*   **Constructief-kritisch.** Beide sprekers zijn overwegend positief over de inspanningen van het kabinet, maar stellen tegelijkertijd kritische vragen en benadrukken mogelijke risico's en aandachtspunten.",
+      "prompt_tokens": 32960,
+      "completion_tokens": 709,
+      "elapsed": 13.65281321600014,
+      "tokens_per_sec": 51.930689212762516
+    }
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "timestamp": "2026-03-15T13:13:49.092390",
+  "test": "Dutch parliamentary summarization",
+  "context_size": 131072,
+  "input_chars": 128922,
+  "input_tokens_est": 32721,
+  "temperature": 0.3,
+  "input_text_preview": "Aan de orde is de behandeling van de wetsvoorstellen:\n\nVaststelling van de begroting van de uitgaven en de ontvangsten van de Nationale Schuld (IXA) voor het jaar 1995 (23900-IXA);\n\nWijziging van hoof...",
+  "results": {
+    "ISTA-DASLab/gemma-3-27b-it-GPTQ-4b-128g": {
+      "content": "## Samenvatting Parlementaire Bijdrage - De Boer (GroenLinks) & Hilarides (VVD)\n\n**Betreft:** Behandeling wetsvoorstellen: Begroting Financiën 1995 & diverse fiscale voorstellen\n\n**1. Hoofdpunten:**\n\n*   **Sanering overheidsfinanciën:** Beide sprekers benadrukken het belang van een gezonde overheidsfinanciën en steunen het kabinet in de inspanningen daartoe, met kanttekeningen over de snelheid en impact van bepaalde maatregelen.\n*   **Budgettaire discipline & Meevallers:** Er is zorg over het vasthouden aan het uitgavenkader en de verleiding om meevallers te besteden in plaats van te gebruiken voor schuldafbouw.\n*   **Fiscale complexiteit & Vereenvoudiging:** Beide sprekers pleiten voor meer eenvoud en duidelijkheid in de fiscale wetgeving en wijzen op de noodzaak van een consistente aanpak.\n*   **Internationale context:** De impact van Europese ontwikkelingen (EMU, afdrachten aan de EU) en internationale fiscale concurrentie worden benadrukt.\n\n**2. Vragen aan de minister(s):**\n\n*   **De Boer:**\n    1.  Hoe ziet de minister de lange-termijn visie op het fiscale beleid?\n    2.  Hoe wordt de spanning tussen de eerste en tweede schijf van de belastingdruk aangepakt?\n    3.  Wat is de visie op de afschaffing van de aftrek van consumptieve rente en de mogelijke gevolgen voor hypotheken?\n    4.  Hoe wordt de discussie over een basisinkomen aangepakt?\n    5.  Hoe wordt de relatie tussen de EU en de Nederlandse financiële positie gezien?\n*   **Hilarides:**\n    1.  Is de toezegging van de minister om de sanering van de overheidsfinanciën te prioriteren, onvoorwaardelijk?\n    2.  Hoe wordt de verhouding tussen de Nederlandse afdrachten aan de EU en de ontvangen middelen beoordeeld?\n    3.  Hoe wordt de afweging tussen budgettaire discipline en stimulering van de werkgelegenheid gemaakt?\n    4.  Hoe wordt de impact van de werknemersspaarregeling op de budgettaire positie beoordeeld en hoe wordt de lastenverschuiving naar werkgevers aangepakt?\n    5.  Hoe wordt de afstemming tussen de fiscale wetgeving en de Pensioen- en spaarfondsenwet gerealiseerd?\n\n**3. Standpunt fractie:**\n\n*   **GroenLinks:** Steunt de sanering van de overheidsfinanciën, maar benadrukt de noodzaak van een eerlijke verdeling van de lasten en een zorgvuldige implementatie van de maatregelen.\n*   **VVD:** Steunt de sanering van de overheidsfinanciën en de noodzaak van budgettaire discipline, met aandacht voor de internationale context en de vereenvoudiging van de fiscale wetgeving.\n\n**4. Toon:**\n\n*   **Analytisch** (beide sprekers)",
+      "prompt_tokens": 32960,
+      "completion_tokens": 706,
+      "elapsed": 13.595258519999334,
+      "tokens_per_sec": 51.92986944392688
+    }
+  }
+}

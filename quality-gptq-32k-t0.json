@@ -1,0 +1,18 @@
+{
+  "timestamp": "2026-03-15T13:27:28.156374",
+  "test": "Dutch parliamentary summarization",
+  "context_size": 32768,
+  "input_chars": 109900,
+  "input_tokens_est": 27893,
+  "temperature": 0.3,
+  "input_text_preview": "Aan de orde is de behandeling van de wetsvoorstellen:\n\nVaststelling van de begroting van de uitgaven en de ontvangsten van de Nationale Schuld (IXA) voor het jaar 1995 (23900-IXA);\n\nWijziging van hoof...",
+  "results": {
+    "ISTA-DASLab/gemma-3-27b-it-GPTQ-4b-128g": {
+      "content": "## Samenvatting Parlementaire Bijdrage - De Boer (GroenLinks)\n\n**1. Hoofdpunten:**\n\n*   **Budgettaire Zorgen:** De spreker uitte bezorgdheid over de budgettaire gevolgen van de wetsvoorstellen, met name de werknemersspaarregeling, en de noodzaak van een solide financiële planning.\n*   **Kritiek op \"Paarse\" Aanpak:** Er werd kritiek geuit op de soms ondoordachte en haastige besluitvorming van het kabinet, en de mogelijke impact op het vertrouwen van burgers.\n*   **Behoefte aan Lange Termijn Visie:** De spreker benadrukte het belang van een duidelijke en consistente lange termijn visie op het fiscale beleid, en de noodzaak van een meer integrale aanpak.\n*   **Aandacht voor Sociale Rechtvaardigheid:** Er werd gepleit voor een beleid dat rekening houdt met de belangen van zwakke groepen en de cumulatie van maatregelen.\n\n**2. Vragen aan de minister:**\n\n1.  Hoe verhoudt de minister zich tot de kritiek van de DNB en de Europese Commissie op het Nederlandse financiële beleid?\n2.  Welke concrete stappen zal de minister ondernemen om de schuldquote te verminderen en een sluitende begroting te realiseren?\n3.  Hoe ziet de minister de relatie tussen de EU-bijdragen en de nationale begroting?\n4.  Hoe beoordeelt de minister de impact van de spaarregeling op de werkgelegenheid en de loonmatiging?\n5.  Hoe zal de minister reageren op de moties van de Tweede Kamer met betrekking tot de spaarregeling?\n6.  Hoe ziet de minister de toekomst van de vermogensbelasting en de relatie tussen ondernemings- en privé-vermogen?\n7.  Hoe beoordeelt de minister de kritiek op de \"zigzag\"-aanpak van het kabinet, met name in relatie tot de spaarregeling?\n8.  Hoe ziet de minister de rol van de overheid bij de financiering van grote projecten?\n9.  Hoe beoordeelt de minister de noodzaak van een meer integrale aanpak van de fiscale wetgeving?\n\n**3. Standpunt fractie:**\n\nDe GroenLinks-fractie steunt de wetsvoorstellen grotendeels, maar benadrukt de noodzaak van een zorgvuldige implementatie en een duidelijke lange termijn visie. Er is bezorgdheid over de budgettaire gevolgen en de mogelijke impact op de sociale rechtvaardigheid.\n\n**4. Toon:**\n\nBezorgd.\n",
+      "prompt_tokens": 28235,
+      "completion_tokens": 598,
+      "elapsed": 25.306065401000524,
+      "tokens_per_sec": 23.630698432335393
+    }
+  }
+}

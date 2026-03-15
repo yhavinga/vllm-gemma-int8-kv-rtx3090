@@ -1,0 +1,18 @@
+{
+  "timestamp": "2026-03-15T13:31:12.517844",
+  "test": "Dutch parliamentary summarization",
+  "context_size": 32768,
+  "input_chars": 109900,
+  "input_tokens_est": 27893,
+  "temperature": 0.3,
+  "input_text_preview": "Aan de orde is de behandeling van de wetsvoorstellen:\n\nVaststelling van de begroting van de uitgaven en de ontvangsten van de Nationale Schuld (IXA) voor het jaar 1995 (23900-IXA);\n\nWijziging van hoof...",
+  "results": {
+    "RedHatAI/gemma-3-27b-it-quantized.w4a16": {
+      "content": "## Samenvatting Parlementaire Bijdrage - De Boer (GroenLinks)\n\n**1. Hoofdpunten:**\n\n*   De spreker benadrukt de complexiteit van het huidige fiscale beleid en de noodzaak van een langetermijnvisie, kritisch op de ad-hoc aanpak.\n*   Er is bezorgdheid over de budgettaire neutraliteit en de impact van de werknemersspaarregeling op de werkgelegenheid en loonmatiging.\n*   De spreker pleit voor een heroverweging van de vermogensbelasting en een geleidelijke afschaffing, met aandacht voor de verdeling van lasten.\n*   Er wordt kritiek geuit op de communicatie rondom wetsvoorstellen en de mogelijke impact op het vertrouwen in de overheid.\n\n**2. Vragen aan de minister:**\n\n1.  Wat is de visie van de minister op de discussie rondom een basisinkomen en de potentiële impact op het sociale zekerheidsstelsel?\n2.  Hoe beoordeelt de minister de kritiek op de onbetrouwbaarheid van het CLD-cijfer en overweegt hij een herziening van de methodologie?\n3.  Welke maatregelen worden genomen om fraude in de collectieve middelen te bestrijden en wat zijn de recente cijfers over fraudebedragen?\n4.  Hoe wordt omgegaan met het misbruik van de Vamil-regeling door vermogende particulieren en welke stappen worden ondernomen om dit te beëindigen?\n5.  Wat is de positie van de regering ten opzichte van de kritiek van de Europese Centrale Bank op het Nederlandse convergentieprogramma?\n6.  Welke prioriteit wordt gegeven aan de vermindering van de staatsschuld en welke consequenties heeft dit voor andere beleidsdoelen?\n7.  Hoe wordt de impact van de werknemersspaarregeling op de werkgelegenheid en loonmatiging beoordeeld en welke maatregelen worden overwogen om eventuele negatieve effecten te compenseren?\n8.  Welk gewicht wordt toegekend aan de moties van de Tweede Kamer met betrekking tot de werknemersspaarregeling en hoe zal hierop worden gereageerd?\n\n**3. Standpunt fractie:**\n\nGroenLinks is kritisch op de ad-hoc aanpak van het kabinet op fiscaal gebied en pleit voor een langetermijnvisie met aandacht voor de verdeling van lasten en het bevorderen van een eerlijke samenleving. De fractie is voor een geleidelijke afschaffing van de vermogensbelasting.\n\n**4. Toon:**\n\nKritisch.",
+      "prompt_tokens": 28235,
+      "completion_tokens": 599,
+      "elapsed": 25.162451525000506,
+      "tokens_per_sec": 23.805311632885022
+    }
+  }
+}

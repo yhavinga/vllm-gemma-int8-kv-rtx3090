@@ -1,0 +1,18 @@
+{
+  "timestamp": "2026-03-15T13:14:20.911926",
+  "test": "Dutch parliamentary summarization",
+  "context_size": 131072,
+  "input_chars": 128922,
+  "input_tokens_est": 32721,
+  "temperature": 0.3,
+  "input_text_preview": "Aan de orde is de behandeling van de wetsvoorstellen:\n\nVaststelling van de begroting van de uitgaven en de ontvangsten van de Nationale Schuld (IXA) voor het jaar 1995 (23900-IXA);\n\nWijziging van hoof...",
+  "results": {
+    "ISTA-DASLab/gemma-3-27b-it-GPTQ-4b-128g": {
+      "content": "## Samenvatting Parlementaire Bijdrage - De Boer (GroenLinks)\n\n**1. Hoofdpunten:**\n\n*   **Budgettaire discipline & Meevallers:** Benadrukt het belang van budgettaire discipline en kritische omgang met eventuele meevallers, die primair voor schuldafbouw gebruikt moeten worden.\n*   **Europese Samenwerking & Afdrachten:** Uitvaagt naar de toenemende financiële afdrachten aan de EU en de noodzaak van een kritische beoordeling van de verhouding tussen inbreng en opbrengst.\n*   **Werknemersspaarregeling & Budgettaire Impact:** Bezorgdheid over de budgettaire gevolgen van het succes van de werknemersspaarregeling en de onevenwichtige lastenverdeling (werkgevers).\n*   **Fiscale Herziening & Consistent Beleid:** Pleit voor een consistente en langetermijnvisie op fiscale herziening, met aandacht voor de impact op verschillende inkomensgroepen.\n\n**2. Vragen aan de minister:**\n\n1.  Is de minister van Financiën betrokken bij de afstemming met de minister van Onderwijs over de financiering van onderwijs, en zo ja, hoe?\n2.  Wat zijn de voor- en nadelen van de \"Zalm-norm\" (uitgavenkader in guldens) en welke gevolgen heeft dit voor de lange termijn?\n3.  Hoe beoordeelt de minister de kritiek van de president van De Nederlandsche Bank op het financiële beleid?\n4.  Wat is de reden voor de stijgende Nederlandse bijdragen aan de EU en welke maatregelen worden overwogen om dit te beperken?\n5.  Hoe ziet de minister de verhouding tussen de fiscale faciliteiten voor werknemerssparen en de loonmatiging?\n6.  Hoe gaat de minister om met de mogelijke budgettaire problemen als de werknemersspaarregeling succesvoller blijkt dan verwacht?\n7.  Hoe beoordeelt de minister de noodzaak van een afstemming tussen het fiscale begrip \"pensioen\" en het begrip in de Pensioen- en spaarfondsenwet?\n8.  Hoe ziet de minister de toekomst van de vermogensbelasting en welke stappen worden gezet voor een geleidelijke afschaffing?\n\n**3. Standpunt fractie:**\n\nGroenLinks steunt de inspanningen voor budgettaire sanering, maar benadrukt het belang van een eerlijke verdeling van de lasten en een kritische blik op de Europese samenwerking. De fractie is bezorgd over de budgettaire impact van de werknemersspaarregeling en pleit voor een consistente en langetermijnvisie op fiscale herziening.\n\n**4. Toon:**\n\nKritisch.\n",
+      "prompt_tokens": 32960,
+      "completion_tokens": 623,
+      "elapsed": 12.013783501000944,
+      "tokens_per_sec": 51.857102298213874
+    }
+  }
+}

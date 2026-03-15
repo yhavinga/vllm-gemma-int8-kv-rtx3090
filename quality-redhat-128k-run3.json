@@ -1,0 +1,18 @@
+{
+  "timestamp": "2026-03-15T13:17:15.941998",
+  "test": "Dutch parliamentary summarization",
+  "context_size": 131072,
+  "input_chars": 128922,
+  "input_tokens_est": 32721,
+  "temperature": 0.3,
+  "input_text_preview": "Aan de orde is de behandeling van de wetsvoorstellen:\n\nVaststelling van de begroting van de uitgaven en de ontvangsten van de Nationale Schuld (IXA) voor het jaar 1995 (23900-IXA);\n\nWijziging van hoof...",
+  "results": {
+    "RedHatAI/gemma-3-27b-it-quantized.w4a16": {
+      "content": "## Samenvatting Parlementaire Bijdrage - Heer Schuyer (D66) - 1995\n\n**1. Hoofdpunten:**\n\n*   **Budgettaire discipline & EU-beleid:** D66 benadrukt het belang van een solide overheidsfinanciën en is kritisch over de financiële afdrachten aan de EU, waarbij de verhouding tussen inkomsten en uitgaven in de gaten moet worden gehouden.\n*   **Vereenvoudiging & Consistentie:** D66 pleit voor een vereenvoudiging van de fiscale wetgeving en een consistent overheidsbeleid, waarbij snelle wijzigingen en ad-hoc oplossingen vermeden moeten worden.\n*   **Aandacht voor de burger:** D66 benadrukt het belang van een eerlijke en transparante fiscale behandeling, waarbij rekening wordt gehouden met de gevolgen voor burgers en bedrijven.\n*   **Brede herwaardering & Pensioenwetgeving:** D66 is positief over de verbeterde uitwerking van de Brede herwaardering, maar benadrukt de noodzaak van een goede afstemming tussen fiscale wetgeving en de Pensioen- en spaarfondsenwet.\n\n**2. Vragen aan de minister:**\n\n1.  Wat is de rol van de minister van Financiën bij het oplossen van het dekkingsprobleem bij Onderwijs en wordt de minister hierin beperkt door de formateur?\n2.  Welke voordelen ziet de minister in de nieuwe norm van het trendmatig begrotingsbeleid (zonder groei van uitgaven) en welke gevolgen heeft dit voor de verschillende pijlers?\n3.  Hoe beoordeelt de minister de opvatting van de Europese Commissie over het ABP-vermogen en de schuldquote, en welke consequenties heeft dit?\n4.  Welke maatregelen worden genomen om de stijgende financiële afdrachten aan de EU te beheersen en wordt er voldoende aandacht besteed aan de verdeling van lasten?\n5.  Hoe wordt de impact van de lease-contracten op de overheidsfinanciën beheerst en worden deze alleen ingezet bij kortlopende projecten?\n6.  Wat is de visie van de minister op de internationale fiscale concurrentiepositie van Nederland en welke mogelijkheden ziet hij om deze te verbeteren?\n7.  Hoe zal de minister omgaan met de moties van de Tweede Kamer over de Brede herwaardering en welke prioriteit zal hij daaraan geven?\n8.  Hoe zal de minister reageren op de budgettaire gevolgen van de werknemersspaarregeling en welke maatregelen worden genomen om de lasten niet eenzijdig bij de werkgevers te leggen?\n9.  Hoe wordt de verhouding tussen het fiscale begrip \"pensioen\" en de Pensioen- en spaarfondsenwet verbeterd en welke overgangsmaatregelen worden getroffen?\n\n**3. Standpunt fractie:**\n\nD66 steunt een zorgvuldig en consistent fiscaal beleid gericht op budgettaire discipline en een eerlijke verdeling van lasten, met aandacht voor de gevolgen voor burgers en bedrijven. De fractie is kritisch op ad-hoc oplossingen en pleit voor een vereenvoudiging van de fiscale wetgeving.\n\n**4. Toon:**\n\nAnalytisch.",
+      "prompt_tokens": 32960,
+      "completion_tokens": 727,
+      "elapsed": 14.062675086999661,
+      "tokens_per_sec": 51.69713411583265
+    }
+  }
+}
