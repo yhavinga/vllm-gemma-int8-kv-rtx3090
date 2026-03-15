@@ -1,16 +1,31 @@
 # ExLlamaV2 + Gemma 3 27B on Dual RTX 3090 (Alternative to vLLM)
 
-ExLlamaV2 is optimized for quantized models on consumer GPUs and can be 20-40% faster than vLLM for certain workloads.
+**Updated:** 2026-03-15
 
-## Why Try ExLlamaV2?
+## Important: Known Issues with Gemma 3
+
+**ExLlamaV2 has unresolved bugs with Gemma 3 models.** See [research/10-exllamav2-multi-gpu-research.md](../research/10-exllamav2-multi-gpu-research.md) for details.
+
+| Issue | Status |
+|-------|--------|
+| Looping/nonsense after 2-3 paragraphs | **Open** (GitHub #777) |
+| Q8 cache degradation | **Open** (GitHub #751) |
+| No EXL2 for 1B/4B/12B | Only 27B available |
+
+**Recommendation:** Stay with vLLM for Gemma 3. Our measured 67 tok/s with vLLM is competitive with ExLlamaV2.
+
+---
+
+## Why Consider ExLlamaV2?
 
 | Feature | vLLM | ExLlamaV2 |
 |---------|------|-----------|
 | **Quantization** | W4A16, FP8, AWQ | EXL2, GPTQ (highly optimized) |
-| **Tensor Parallel** | Yes | Yes (via TabbyAPI) |
+| **Tensor Parallel** | Yes (mature) | Yes (experimental) |
 | **Batching** | PagedAttention | Yes |
-| **Speed (single request)** | Good | Often faster |
+| **Speed (single request)** | Good | Often faster (for other models) |
 | **API** | OpenAI-compatible | OpenAI-compatible (via TabbyAPI) |
+| **Gemma 3 Support** | **Excellent** | **Buggy** |
 
 ## Installation
 
@@ -122,16 +137,28 @@ print(f"vLLM: {vllm_speed:.1f} tok/s")
 print(f"ExLlamaV2: {exllama_speed:.1f} tok/s")
 ```
 
-## Expected Performance
+## Measured Performance (Updated 2026-03-15)
 
-Based on community benchmarks for dual RTX 3090 with NVLink:
+### Our vLLM Results (Optimized)
 
-| Backend | Quantization | Single Request | Batch (4) |
-|---------|--------------|----------------|-----------|
-| vLLM (current) | W4A16 | ~21 tok/s | ~50-80 tok/s |
-| ExLlamaV2 | EXL2 4bpw | ~25-35 tok/s | ~60-100 tok/s |
+| Model | Config | Single tok/s | Batch(4) tok/s |
+|-------|--------|--------------|----------------|
+| 27B W4A16 | vLLM TP=2, CUDA graphs | **67.5** | **244** |
+| 12B W4A16 | vLLM TP=2 | **115** | **394** |
+| 4B W4A16 | vLLM TP=1 | **176** | **581** |
+| 1B W8A8 | vLLM TP=1 | **263** | **887** |
 
-The improvement comes from ExLlamaV2's highly optimized quantization kernels.
+### Expected ExLlamaV2 Performance (Estimated)
+
+| Backend | Quantization | Single Request | Notes |
+|---------|--------------|----------------|-------|
+| ExLlamaV2 TP | EXL2 4bpw | ~50-70 tok/s | Comparable to vLLM |
+| ExLlamaV2 gpu_split | EXL2 4bpw | ~25-40 tok/s | Layer split only |
+
+**Note:** ExLlamaV2 may not outperform our optimized vLLM setup due to:
+1. vLLM's CUDA graph optimization (`FULL_DECODE_ONLY`)
+2. Marlin kernels already excellent for W4A16
+3. ExLlamaV2 TP is still experimental
 
 ## NVLink with ExLlamaV2
 
@@ -162,7 +189,24 @@ export NCCL_P2P_LEVEL=NVL
 
 ## Recommendation
 
-1. **Keep your current vLLM setup** as baseline (~21 tok/s)
-2. **Try ExLlamaV2** as an experiment
-3. **Compare** with the benchmark script
-4. Use whichever gives better results for your use case
+### For Gemma 3: Use vLLM
+
+| Model | Use | Reason |
+|-------|-----|--------|
+| **1B** | vLLM W8A8 | No EXL2 exists |
+| **4B** | vLLM W4A16 | No EXL2 exists |
+| **12B** | vLLM W4A16 | No EXL2 exists |
+| **27B** | vLLM W4A16 | Known EXL2 bugs |
+
+### For Other Models: Consider ExLlamaV2
+
+ExLlamaV2 excels with Llama 3, Mistral, and Qwen models where:
+1. No known bugs exist
+2. Full range of EXL2 quantizations available
+3. Tensor parallelism is more stable
+
+### When to Revisit ExLlamaV2 for Gemma 3
+
+1. Once GitHub #777 (looping bug) is fixed
+2. Once turboderp provides 1B/4B/12B EXL2 quantizations
+3. Once ExLlamaV3 (EXL3 format) matures

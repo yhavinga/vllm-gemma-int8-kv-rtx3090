@@ -285,9 +285,39 @@ flashinfer-cubin==0.6.4
 
 ---
 
+## ExLlamaV2/V3 Alternative Evaluation
+
+**See full research:** [10-exllamav2-multi-gpu-research.md](10-exllamav2-multi-gpu-research.md)
+
+### Summary: vLLM is Better for Gemma 3
+
+| Model | EXL2/EXL3 Available | Recommendation |
+|-------|---------------------|----------------|
+| **1B** | **NO** | Use vLLM W8A8 |
+| **4B** | **NO** | Use vLLM W4A16 |
+| **12B** | **NO** | Use vLLM W4A16 |
+| **27B** | Yes (buggy) | Use vLLM W4A16 |
+
+### Key Issues with ExLlamaV2 + Gemma 3
+
+1. **No quantizations for 1B/4B/12B** - turboderp only provides 27B
+2. **Known bugs** - Looping/nonsense generation after 2-3 paragraphs
+3. **Long context issues** - Gemma 3's sliding window not properly implemented
+4. **Q8 cache problems** - Must use FP16 cache, losing VRAM savings
+
+### When ExLlamaV2 Makes Sense
+
+- **Other models** (Llama 3, Mistral, Qwen) - excellent support
+- **Extreme VRAM constraints** - EXL2 3bpw can fit 27B on single GPU
+- **Future** - Once Gemma 3 bugs are fixed
+
+---
+
 ## References
 
 - [RedHatAI Gemma 3 Models](https://huggingface.co/RedHatAI)
 - [ISTA-DASLab GPTQ Collection](https://huggingface.co/collections/ISTA-DASLab/gemma3-gptq)
 - [vLLM Documentation](https://docs.vllm.ai/)
 - [Gemma 3 Technical Report](https://ai.google.dev/gemma)
+- [ExLlamaV2 GitHub](https://github.com/turboderp-org/exllamav2)
+- [turboderp gemma-3-27b-it-exl2](https://huggingface.co/turboderp/gemma-3-27b-it-exl2)
