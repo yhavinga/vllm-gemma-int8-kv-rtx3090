@@ -130,11 +130,31 @@ See `scripts/int8_kv_cache_poc.py` for the standalone POC:
 
 ## Performance Results
 
-| Mode | Throughput | vs BF16 |
-|------|------------|---------|
-| BF16 baseline | 67 tok/s | - |
-| INT8 + FULL_DECODE_ONLY | **58-59 tok/s** | **-12%** |
-| INT8 + enforce-eager | 10.7 tok/s | -84% |
+### By Context Length
+
+| Context | BF16 | INT8 | Change |
+|---------|------|------|--------|
+| Short (<1K tokens) | 68 tok/s | 66 tok/s | -3% |
+| Medium (~600 tokens) | 65 tok/s | 64 tok/s | -2% |
+| Long (7K tokens) | 24 tok/s | **45 tok/s** | **+87%** |
+| Very Long (12K tokens) | 24 tok/s | **40 tok/s** | **+67%** |
+
+**Key finding:** INT8 is a massive win for long context because it halves KV cache
+memory bandwidth - the bottleneck for sequences >4K tokens where cascade attention
+forces eager mode fallback.
+
+### Why Long Context Improves More
+
+Gemma 3's hybrid attention (sliding window + full attention) triggers cascade
+attention for sequences >4K tokens. This disables CUDA graphs and makes decode
+memory-bandwidth-bound. INT8 cuts KV cache bandwidth in half → ~2x speedup.
+
+### CUDA Graph Modes
+
+| Mode | Short Context | Long Context |
+|------|---------------|--------------|
+| FULL_DECODE_ONLY | 66 tok/s | 45 tok/s |
+| enforce-eager | 11 tok/s | 11 tok/s |
 
 **Key insight:** Use `FULL_DECODE_ONLY` CUDA graphs, not `--enforce-eager`!
 
