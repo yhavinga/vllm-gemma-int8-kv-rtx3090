@@ -101,19 +101,34 @@ Memory explosion, impractical.
 - [x] FULL_DECODE_ONLY CUDA graphs
 - [x] Speculative decoding (tried, no improvement - draft overhead exceeded gains)
 
-### Potential Optimizations
+### Investigated Optimizations
 
-1. **Global layer KV cache fusion**
-   - All 10 global layers read the same full-context KV
-   - Could fuse reads or use shared memory
+#### 1. Global Layer KV Cache Fusion - NOT FEASIBLE
 
-2. **Layer-specific KV quantization**
-   - INT4 for global layers (read more data, lower precision acceptable)
-   - INT8 for sliding layers (read less data, keep precision)
+Each of the 10 global layers has independent K/V projections (different learned weights).
+There's no shared data to fuse. The only theoretical optimization would be kernel-level
+multi-layer attention, which would actually be WORSE for memory bandwidth (need to keep
+10x more KV data resident in registers/shared memory).
 
-3. **Asymmetric attention**
-   - Lower precision for distant tokens in global layers
-   - Full precision for recent tokens
+#### 2. Layer-specific INT4 KV Quantization - NOT WORTH IT
+
+Analyzed using INT4 for global layers (read full context) while keeping INT8 for sliding
+layers (read only 1024 tokens).
+
+| Context | INT8 All | INT4 Global | KV Reduction | Throughput Gain |
+|---------|----------|-------------|--------------|-----------------|
+| 4K | 0.72 GB | 0.56 GB | 22% | 1.1% |
+| 8K | 1.03 GB | 0.72 GB | 30% | 2.1% |
+| 16K | 1.66 GB | 1.03 GB | 38% | 4.2% |
+| 32K | 2.91 GB | 1.66 GB | 43% | **8.0%** |
+
+**Why not worth it:**
+- Maximum 8% speedup at 32K context
+- High implementation complexity (new kernels, per-layer config, bit packing)
+- Quality risk: INT4 has 16x less precision than INT8 (16 vs 255 levels)
+- Model weights (14GB) still dominate bandwidth at all context lengths
+
+INT8 already captures most of the memory bandwidth benefit with acceptable quality.
 
 ## Conclusion
 
