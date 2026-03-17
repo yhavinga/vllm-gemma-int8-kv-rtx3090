@@ -50,6 +50,7 @@ curl http://localhost:8000/v1/chat/completions \
 5. [SGLang Comparison](research/05-sglang-comparison.md) - vLLM wins on RTX 3090
 11. [INT8 KV Cache](research/11-int8-kv-cache.md) - 2x memory savings, +87% long context speed
 12. [Qwen 3.5 Comparison](research/12-qwen35-comparison.md) - DeltaNet vs Gemma 3 hybrid attention
+13. [CUDA Graphs & Cascade](research/13-cuda-graphs-cascade-analysis.md) - Why cascade attention is a red herring
 
 ## Scripts
 
