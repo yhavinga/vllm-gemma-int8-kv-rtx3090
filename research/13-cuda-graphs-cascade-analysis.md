@@ -130,16 +130,51 @@ layers (read only 1024 tokens).
 
 INT8 already captures most of the memory bandwidth benefit with acceptable quality.
 
-## Conclusion
+#### 3. Software FP8 E4M3 Emulation - NOT WORTH IT
 
-The "cascade attention + CUDA graphs" framing was a red herring. Gemma 3's performance
-characteristics are fundamentally determined by:
+Investigated using FP8 E4M3 format (from Qwen 3.5 quantization repo) with software
+emulation on Ampere (no hardware FP8).
 
-1. **Memory bandwidth** - 10 global layers reading full context
-2. **Architectural choice** - 5:1 local:global ratio trades compute for memory
+| Metric | INT8 (current) | FP8 E4M3 (block-wise) |
+|--------|---------------|----------------------|
+| MSE | 0.0125 | 0.0189 |
+| Max error | 0.19 | 1.92 |
+| Cosine sim | 0.99978 | 0.99967 |
+| Complexity | Low | High |
 
-Further optimization should focus on reducing memory bandwidth for global attention
-layers, not CUDA graph capture strategies.
+**Why INT8 beats FP8 for KV cache:**
+- KV values are near-Gaussian distributed, not outlier-heavy
+- INT8's 255 uniform levels capture this distribution well
+- FP8's log-scale wastes precision in the common value range
+- Same memory footprint (8 bits), but INT8 is simpler and faster
+
+FP8 E4M3 is valuable for **model weights** where activation outliers need dynamic
+range. KV cache values don't have this problem.
+
+## Final Conclusion
+
+We've exhaustively explored optimization paths for Gemma 3 27B on RTX 3090:
+
+| Optimization | Status | Result |
+|--------------|--------|--------|
+| INT8 KV cache | DONE | **+87% at long context** |
+| CUDA graphs (FULL_DECODE_ONLY) | DONE | **+200% at short context** |
+| Speculative decoding | Tried | No gain (draft overhead) |
+| Cascade attention + piecewise graphs | N/A | Disabled for sliding window |
+| KV cache fusion | Analyzed | Not feasible (independent projections) |
+| Layer-specific INT4 | Analyzed | Not worth it (+8% max, quality risk) |
+| Software FP8 E4M3 | Analyzed | INT8 is actually better for KV |
+
+**The fundamental bottleneck is architectural:**
+- 10 global attention layers must read full context (O(n²))
+- 52 sliding window layers only read 1024 tokens (O(n))
+- Memory bandwidth dominates at long context
+
+**We've reached the optimization ceiling for this hardware + model combination.**
+Further gains require:
+- Better hardware (H100 with native FP8, more bandwidth)
+- Different model architecture (fewer global layers, linear attention)
+- Application-level optimization (shorter prompts, caching, batching)
 
 ## References
 
