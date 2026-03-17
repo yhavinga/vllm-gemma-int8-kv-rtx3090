@@ -130,42 +130,71 @@ See `scripts/int8_kv_cache_poc.py` for the standalone POC:
 
 ## Performance Results
 
-### By Context Length
+### Complete Benchmark Matrix
+
+Tested with FULL_DECODE_ONLY CUDA graphs, INT8 KV cache, W4A16 model weights.
+
+| Prompt Tokens | INT8 tok/s | Notes |
+|---------------|------------|-------|
+| ~350 | **60.6** | Short prompt, CUDA graphs active |
+| ~1,300 | 38.0 | Below cascade threshold |
+| ~2,300 | 40.1 | Below cascade threshold |
+| ~4,300 | 28.1 | **Cascade attention kicks in** |
+| ~8,400 | 18.2 | Full cascade mode |
+| ~32,000 | 9.6 | Very long context (64K max-model-len) |
+
+### The Cascade Attention Cliff
+
+Gemma 3 uses hybrid attention: sliding window (4K) for local context + full
+attention for global context. When sequence length exceeds ~4K tokens:
+
+1. vLLM switches to "cascade attention" mode
+2. CUDA graphs are disabled ("No piecewise cudagraph for cascade attention")
+3. Performance drops ~50% and degrades further with longer context
+
+**This is the fundamental bottleneck** - not INT8 vs BF16, not CUDA graph mode.
+The ~4K token threshold is architectural to Gemma 3.
+
+### INT8 vs BF16 (Long Context)
 
 | Context | BF16 | INT8 | Change |
 |---------|------|------|--------|
-| Short (<1K tokens) | 68 tok/s | 66 tok/s | -3% |
-| Medium (~600 tokens) | 65 tok/s | 64 tok/s | -2% |
-| Long (7K tokens) | 24 tok/s | **45 tok/s** | **+87%** |
-| Very Long (12K tokens) | 24 tok/s | **40 tok/s** | **+67%** |
+| ~7K tokens | 24 tok/s | **45 tok/s** | **+87%** |
+| ~12K tokens | 24 tok/s | **40 tok/s** | **+67%** |
 
-**Key finding:** INT8 is a massive win for long context because it halves KV cache
-memory bandwidth - the bottleneck for sequences >4K tokens where cascade attention
-forces eager mode fallback.
+INT8 still wins big for long context because it halves KV cache memory bandwidth.
 
-### Why Long Context Improves More
+### Maximum Context Limits
 
-Gemma 3's hybrid attention (sliding window + full attention) triggers cascade
-attention for sequences >4K tokens. This disables CUDA graphs and makes decode
-memory-bandwidth-bound. INT8 cuts KV cache bandwidth in half → ~2x speedup.
+| max-model-len | CUDA Graph Mode | Works? | Notes |
+|---------------|-----------------|--------|-------|
+| 32K | FULL_DECODE_ONLY | Yes | Recommended for most use |
+| 64K | FULL_DECODE_ONLY | Yes | Tested, ~10 tok/s at 32K prompts |
+| 128K | FULL_DECODE_ONLY | **OOM** | Too much KV cache for graphs |
+| 128K | enforce-eager | Yes | ~8 tok/s, no CUDA graphs |
 
-### CUDA Graph Modes
-
-| Mode | Short Context | Long Context |
-|------|---------------|--------------|
-| FULL_DECODE_ONLY | 66 tok/s | 45 tok/s |
-| enforce-eager | 11 tok/s | 11 tok/s |
-
-**Key insight:** Use `FULL_DECODE_ONLY` CUDA graphs, not `--enforce-eager`!
+**Recommendation:** Use 64K max-model-len with FULL_DECODE_ONLY for best balance
+of context length and performance.
 
 ### Optimal INT8 Configuration
 
+For balanced performance (up to 64K context):
 ```bash
 vllm serve "RedHatAI/gemma-3-27b-it-quantized.w4a16" \
     --tensor-parallel-size 2 --disable-custom-all-reduce \
     --kv-cache-dtype int8 --calculate-kv-scales \
-    --max-model-len 16384 --gpu-memory-utilization 0.90 \
-    --compilation-config '{"cudagraph_mode": "FULL_DECODE_ONLY", "cudagraph_capture_sizes": [1, 2, 4, 8, 16, 32]}'
+    --max-model-len 65536 --gpu-memory-utilization 0.90 \
+    --compilation-config '{"cudagraph_mode": "FULL_DECODE_ONLY", \
+        "cudagraph_capture_sizes": [1, 2, 4, 8, 16, 32]}'
+```
+
+For maximum context (128K, slower):
+```bash
+vllm serve "RedHatAI/gemma-3-27b-it-quantized.w4a16" \
+    --tensor-parallel-size 2 --disable-custom-all-reduce \
+    --kv-cache-dtype int8 --calculate-kv-scales \
+    --max-model-len 131072 --gpu-memory-utilization 0.90 \
+    --enforce-eager
 ```
 
 ## Current Limitations
