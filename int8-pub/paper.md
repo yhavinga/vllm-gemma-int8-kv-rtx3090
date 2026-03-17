@@ -177,7 +177,7 @@ Before focusing on 1B/4B throughput, we explored optimizations for 27B on the sa
 
 | Optimization | Result | Notes |
 |--------------|--------|-------|
-| **INT8 KV cache** | **+87% at 7K context** | Success—but 27B is single-request limited |
+| **INT8 KV cache** | **+87% at 7K, -9% at short** | Wins at long context, slight overhead at short |
 | Speculative decoding | No gain | Draft model overhead exceeded speedup |
 | Cascade attention + piecewise CUDA graphs | N/A | Disabled for sliding window models |
 | KV cache fusion (global layers) | Infeasible | Independent projections per layer |
@@ -187,7 +187,18 @@ Before focusing on 1B/4B throughput, we explored optimizations for 27B on the sa
 | ExLlamaV2/V3 | 35-50% slower | Known Gemma 3 bugs, no 128K support |
 | Qwen 3.5 27B (DeltaNet) | 1.5-2x slower | Linear attention overhead > memory savings |
 
-### 5.2 The Fundamental 27B Bottleneck
+### 5.2 27B INT8 Results (TP=2)
+
+| Context | BF16 KV | INT8 KV | Change |
+|---------|---------|---------|--------|
+| Short (<4K) | 67 tok/s | 61 tok/s | **-9%** |
+| 7K tokens | 24 tok/s | **45 tok/s** | **+87%** |
+| 12K tokens | 24 tok/s | **40 tok/s** | **+67%** |
+| Max context | 32K | **128K** | **4x** |
+
+**Interpretation:** At short context, quantization/dequantization overhead dominates. At long context, memory bandwidth becomes the bottleneck, and INT8's 2x memory reduction wins decisively. The crossover point is ~4K tokens.
+
+### 5.3 The Architectural Bottleneck
 
 Gemma 3's hybrid attention architecture:
 - 52 sliding window layers (1024 tokens, O(n))
@@ -202,7 +213,7 @@ Observed: 9.6 tok/s at 32K context
 
 The gap comes from attention compute and TP synchronization. **No software optimization can exceed hardware bandwidth limits.**
 
-### 5.3 Why 1B/4B are Different
+### 5.4 Why 1B/4B are Different
 
 Small models are **compute-bound**, not memory-bound:
 - Model weights: 1.5-3 GB (fits in L2 cache for batch operations)
