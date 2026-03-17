@@ -64,16 +64,53 @@ We chose INT8 because Ampere has hardware INT8 tensor cores, and KV cache values
 
 ### 3.2 Quantization Scheme
 
-Per-tensor symmetric INT8:
+**This is true symmetric INT8, not FP8-in-INT8.** The key difference:
+- FP8 E4M3: 4 exponent + 3 mantissa bits = logarithmic scale (good for outliers)
+- INT8: 8 bits uniform linear quantization = 255 evenly-spaced levels (good for Gaussian)
 
-```python
-# Quantize (write path)
-scale = absmax(tensor) / 127
-int8_val = round(tensor / scale).clamp(-128, 127)
+KV cache values follow near-Gaussian distributions with few outliers. INT8's uniform quantization captures this better than FP8's log-scale, which wastes precision in the common value range.
 
-# Dequantize (read path)
-tensor = int8_val * scale
+**Data flow:**
+
 ```
+WRITE PATH (every forward pass):
+┌─────────────┐     ┌──────────────┐     ┌─────────────┐     ┌──────────┐
+│ K/V (BF16)  │ ──► │ ÷ scale      │ ──► │ round+clamp │ ──► │ INT8     │
+│ from model  │     │ (to FP32)    │     │ [-128,127]  │     │ in cache │
+└─────────────┘     └──────────────┘     └─────────────┘     └──────────┘
+
+READ PATH (attention computation):
+┌──────────┐     ┌──────────────┐     ┌─────────────┐     ┌────────────┐
+│ INT8     │ ──► │ cast to FP32 │ ──► │ × scale     │ ──► │ K/V (BF16) │
+│ from cache│     │              │     │ cast to BF16│     │ for attn   │
+└──────────┘     └──────────────┘     └─────────────┘     └────────────┘
+```
+
+**Quantization math:**
+```python
+# Scale computation (once per layer, per forward pass)
+k_scale = k.abs().amax() / 127.0  # Per-tensor symmetric
+v_scale = v.abs().amax() / 127.0
+
+# Write path (Triton kernel)
+k_int8 = round(k_bf16 / k_scale).clamp(-128, 127).to(int8)
+v_int8 = round(v_bf16 / v_scale).clamp(-128, 127).to(int8)
+
+# Read path (Triton kernel) - dequantize BEFORE attention
+k_bf16 = k_int8.to(float32) * k_scale  # Back to original range
+v_bf16 = v_int8.to(float32) * v_scale
+# Then compute: softmax(Q @ K^T / sqrt(d)) @ V in BF16
+```
+
+**Why per-tensor (not per-channel)?**
+- Simpler: one scale per K, one per V (not per head or per token)
+- Fast: scale lookup is single memory read
+- Sufficient: transformer K/V values cluster tightly around zero
+- Memory: 2 floats overhead vs 2×num_heads×2 for per-channel
+
+**Scale storage:** Scales are stored alongside the KV cache. vLLM's `--calculate-kv-scales` flag computes them dynamically from the actual K/V values during the first forward pass, then reuses them. The `k_scale` and `v_scale` buffers are pre-allocated.
+
+**Warmup edge case:** During warmup, vLLM runs forward passes with zero inputs. This would give `absmax=0`, causing division by zero. We detect this and use a default scale of `20.0/127 ≈ 0.157`, which covers the typical K/V value range of [-20, 20].
 
 Scale is computed once per forward pass via `--calculate-kv-scales`. Default scale (0.157, assuming absmax=20) handles warmup when inputs are zeros.
 
@@ -324,35 +361,104 @@ These numbers make consumer hardware viable for generating training data at scal
 3. Google. "Gemma 3 Technical Report." 2025.
 4. RedHatAI. "Gemma 3 Quantized Models." HuggingFace Hub.
 
-## Appendix: Triton Kernel Snippets
+## Appendix A: Triton Kernel Implementation
 
 ### A.1 INT8 Quantization (Write Path)
 
+The write path runs every time new K/V values are added to the cache. It must:
+1. Load BF16 values from the model output
+2. Divide by scale (computed earlier from absmax)
+3. Round to nearest integer
+4. Clamp to [-128, 127] range
+5. Store as INT8
+
 ```python
 # triton_reshape_and_cache_flash.py
+# INT8_KV_CACHE is a tl.constexpr (compile-time constant)
+
 elif INT8_KV_CACHE:
+    # key_load is BF16 from model, k_scale is float32 scalar
     key_scaled = key_load.to(tl.float32) / tl.load(k_scale)
+
+    # Use libdevice.round for proper rounding (not truncation)
     key_rounded = tl.extra.cuda.libdevice.round(key_scaled)
+
+    # Clamp to INT8 range, then cast
     key_tile = tl.maximum(tl.minimum(key_rounded, 127.0), -128.0).to(tl.int8)
 
+    # Same for values
     value_scaled = value_load.to(tl.float32) / tl.load(v_scale)
     value_rounded = tl.extra.cuda.libdevice.round(value_scaled)
     value_tile = tl.maximum(tl.minimum(value_rounded, 127.0), -128.0).to(tl.int8)
+
+    # key_tile and value_tile are written to KV cache as INT8
 ```
 
 ### A.2 INT8 Dequantization (Read Path)
 
+The read path runs during attention computation. It must restore INT8 values to BF16 before the attention matmul. **Attention itself runs in full precision (BF16).**
+
 ```python
 # triton_unified_attention.py
+# K_load is INT8 from cache, k_scale is float32 scalar
+
 elif INT8_KV_CACHE:
+    # Cast INT8 → FP32 → multiply by scale → cast to Q.dtype (BF16)
     K = (K_load.to(tl.float32) * tl.load(k_scale)).to(Q.dtype)
     V = (V_load.to(tl.float32) * tl.load(v_scale)).to(Q.dtype)
+
+    # K and V are now BF16, ready for attention:
+    # scores = Q @ K^T / sqrt(d)
+    # output = softmax(scores) @ V
 ```
 
-### A.3 Warmup Scale Handling
+**Why FP32 intermediate?** Direct INT8→BF16 cast would lose the fractional part. We cast to FP32, multiply by scale (which restores the original magnitude), then cast to BF16 for attention.
+
+### A.3 Scale Computation
+
+Scales are computed in Python during the first forward pass:
 
 ```python
-# attention.py
-if is_int8 and k_absmax.item() < 0.01:
-    k_absmax = torch.tensor(20.0, device=k_absmax.device)  # Default range
+# attention.py - called once per layer during warmup
+
+def _update_kv_scales(self, key, value):
+    # Compute absmax across entire tensor
+    k_absmax = key.abs().amax()
+    v_absmax = value.abs().amax()
+
+    # Handle warmup with zero inputs
+    if self.kv_cache_dtype == 'int8':
+        if k_absmax.item() < 0.01:
+            k_absmax = torch.tensor(20.0, device=k_absmax.device)
+        if v_absmax.item() < 0.01:
+            v_absmax = torch.tensor(20.0, device=v_absmax.device)
+
+    # INT8 range is 127 (not 200/100 like FP8)
+    k_range = 127 if self.kv_cache_dtype == 'int8' else K_SCALE_CONSTANT
+    v_range = 127 if self.kv_cache_dtype == 'int8' else V_SCALE_CONSTANT
+
+    # scale = absmax / range, so quantized = original / scale fits in range
+    self.k_scale.copy_(k_absmax / k_range)
+    self.v_scale.copy_(v_absmax / v_range)
+```
+
+### A.4 Memory Layout
+
+KV cache is stored as contiguous INT8 tensors:
+
+```
+Cache shape: [num_blocks, block_size, num_kv_heads, head_dim]
+Dtype: torch.int8 (1 byte per element)
+
+Memory per token = num_kv_heads × head_dim × 2 (K+V) × 1 byte
+                 = 8 × 256 × 2 × 1 = 4KB (for Gemma 3 4B)
+
+vs FP16: 8 × 256 × 2 × 2 = 8KB per token (2x larger)
+```
+
+Scales are stored separately as FP32:
+```
+k_scale: [1] float32 per layer
+v_scale: [1] float32 per layer
+Total: 2 × 4 bytes × num_layers = 512 bytes for 64-layer model (negligible)
 ```
