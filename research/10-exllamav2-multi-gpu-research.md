@@ -301,18 +301,19 @@ output = generator.generate(prompt, sampler=DefaultSampler(), max_new_tokens=256
 - 64K context is the practical maximum (model + FP16 cache uses ~22GB per GPU)
 - 128K causes OOM even with tensor parallelism
 - Prefill throughput scales well (higher efficiency at longer contexts)
-- Generation remains stable at ~44 tok/s regardless of context length
+- Generation speed degrades with context length (44→19 tok/s)
 
 ### Context-Dependent Performance Comparison
 
 | Context | Prompt Tokens | vLLM W4A16 | ExLlamaV3 EXL3 | Winner |
 |---------|---------------|------------|----------------|--------|
 | **8K (short)** | ~2K | **67 tok/s** | 44 tok/s | vLLM (+52%) |
-| **32K** | ~8K | ~35 tok/s | **44 tok/s** | ExLlamaV3 (+26%) |
-| **64K (full text)** | ~33K | **21 tok/s** | 15.5 tok/s | vLLM (+35%) |
+| **32K** | ~8K | **~35 tok/s** | 22 tok/s | vLLM (+59%) |
+| **64K** | ~15K | **~25 tok/s** | 19 tok/s | vLLM (+32%) |
+| **128K (full text)** | ~33K | **21 tok/s** | 15.5 tok/s | vLLM (+35%) |
 | **128K** | ~33K | **21 tok/s** | OOM | vLLM (only option) |
 
-**Key insight:** At short-medium contexts (up to ~16K tokens), ExLlamaV3 maintains ~44 tok/s. But at full 33K token prompts, ExLlamaV3 drops to 15.5 tok/s while vLLM achieves 21 tok/s. vLLM wins at both extremes (short and very long context).
+**Key insight:** Both backends degrade with context length due to KV cache memory bandwidth. vLLM is faster at ALL context lengths, with the gap being largest at short contexts (+52%) and smallest at long contexts (+32-35%).
 
 ### Quality Comparison: Dutch Parliamentary Summarization
 
@@ -348,17 +349,16 @@ Both models tested on 128,922 character Dutch parliamentary debate (~33K tokens)
 ### When to Use Each
 
 **Use vLLM when:**
-- Short context (<8K) - 67 tok/s is 3x faster
+- Speed is priority - vLLM is faster at ALL context lengths
 - Need 128K context - only option that works
 - Batching multiple requests - vLLM excels here
 - Simpler setup preferred
-- Full-context long documents (~33K+ tokens)
 
 **Use ExLlamaV3 when:**
-- Medium context (8K-16K tokens) - competitive speed
 - Lower VRAM needed (~40%/GPU vs 90%/GPU)
-- Want EXL3 quantization (potentially better quality)
-- More comprehensive multi-speaker summaries preferred
+- Want EXL3 quantization (potentially better quality per bit)
+- 64K context is sufficient
+- Different summary style preferred (more comprehensive)
 
 ---
 
@@ -480,17 +480,18 @@ print(output)
 
 **For Gemma 3 27B on dual RTX 3090 with NVLink:**
 
-1. **Short prompts (<8K):** Use **vLLM** - 67 tok/s is unbeatable
-2. **Long context (128K):** Use **vLLM** - only option that works
-3. **Medium context (8K-32K):** **Either** works well
-4. **Best summary quality:** **ExLlamaV3** produced more comprehensive output
+**vLLM wins on speed at ALL context lengths:**
+- Short (2K tokens): 67 vs 44 tok/s (+52%)
+- Medium (8K tokens): 35 vs 22 tok/s (+59%)
+- Long (33K tokens): 21 vs 15.5 tok/s (+35%)
 
-**Recommended default: vLLM** for simplicity and 128K support.
+**Recommended default: vLLM** for speed, simplicity, and 128K support.
 
-**ExLlamaV3 is a viable alternative** now that tensor parallelism works for Gemma 3. Consider it for:
-- Lower VRAM requirements
-- EXL3 quantization benefits
+**ExLlamaV3 is a viable alternative** for:
+- Lower VRAM requirements (~40% vs 90% per GPU)
+- EXL3 quantization benefits (better quality per bit)
 - When 64K context is sufficient
+- Different summary style (more comprehensive multi-speaker)
 
 ---
 
