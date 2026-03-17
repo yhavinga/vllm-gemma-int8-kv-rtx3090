@@ -1,0 +1,28 @@
+{
+  "timestamp": "2026-03-17T16:44:11.222796",
+  "config": {
+    "models": [
+      "1b-w8a8"
+    ],
+    "context_lengths": [
+      4096
+    ],
+    "output_tokens": 128
+  },
+  "results": {
+    "1b-w8a8": {
+      "model": {
+        "name": "RedHatAI/gemma-3-1b-it-quantized.w8a8",
+        "size": "1B",
+        "quant": "W8A8",
+        "model_vram_gb": 1.5,
+        "max_context": 128000
+      },
+      "configs": {
+        "4k": {
+          "error": "server_timeout"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "timestamp": "2026-03-17T17:07:19.883748",
+  "config": {
+    "models": [
+      "1b-w8a8"
+    ],
+    "context_lengths": [
+      4096
+    ],
+    "output_tokens": 128
+  },
+  "results": {
+    "1b-w8a8": {
+      "model": {
+        "name": "RedHatAI/gemma-3-1b-it-quantized.w8a8",
+        "size": "1B",
+        "quant": "W8A8",
+        "model_vram_gb": 1.5,
+        "max_context": 128000
+      },
+      "configs": {
+        "4k": {
+          "context_len": 4096,
+          "optimal_batch_size": 256,
+          "max_throughput": 8177.002080084647,
+          "avg_throughput": 8175.362179959182
+        }
+      }
+    }
+  }
+}
