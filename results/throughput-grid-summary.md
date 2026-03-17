@@ -58,14 +58,14 @@
 
 ### Throughput (tok/s)
 
-| Context | TP=1 | TP=2 | DP=2 | DP=2+INT8 | Best |
-|---------|------|------|------|-----------|------|
-| **4K** | 4,066 | 5,612 | 7,298 | - | DP=2 |
-| **8K** | 4,067 | 5,600 | 7,317 | - | DP=2 |
-| **16K** | 4,037 | 5,572 | 7,296 | - | DP=2 |
-| **32K** | 4,014 | 5,371 | 7,182 | **7,435** | DP=2+INT8 |
-| **64K** | - | 5,216 | - | **7,545** | DP=2+INT8 |
-| **128K** | - | 4,741 | - | **7,254** | DP=2+INT8 |
+| Context | TP=1 | TP=2 | TP=2+INT8 | DP=2 | DP=2+INT8 | Best |
+|---------|------|------|-----------|------|-----------|------|
+| **4K** | 4,066 | 5,612 | 5,559 | **7,298** | - | DP=2 |
+| **8K** | 4,067 | 5,600 | 5,513 | **7,317** | - | DP=2 |
+| **16K** | 4,037 | 5,572 | 5,533 | **7,296** | - | DP=2 |
+| **32K** | 4,014 | 5,371 | 5,404 | 7,182 | **7,435** | DP=2+INT8 |
+| **64K** | - | 5,216 | 5,108 | - | **7,545** | DP=2+INT8 |
+| **128K** | - | 4,741 | 4,711 | - | **7,254** | DP=2+INT8 |
 
 ### Optimal Batch Size
 
@@ -87,7 +87,20 @@
 | 16K | +38% | **+81%** |
 | 32K | +34% | **+79%** |
 
-**Key Finding:** DP=2 beats TP=2 by 30% for contexts ≤32K. Use TP=2 only for 64K+ context.
+**Key Finding:** DP=2 beats TP=2 by 30% for contexts ≤32K. DP=2+INT8 is best for all context lengths.
+
+### INT8 KV Cache Impact
+
+| Context | TP=2 | TP=2+INT8 | INT8 Impact | DP=2+INT8 | DP vs TP (INT8) |
+|---------|------|-----------|-------------|-----------|-----------------|
+| 4K | 5,612 | 5,559 | **-1%** | - | - |
+| 8K | 5,600 | 5,513 | **-2%** | - | - |
+| 16K | 5,572 | 5,533 | **-1%** | - | - |
+| 32K | 5,371 | 5,404 | **+1%** | 7,435 | **+38%** |
+| 64K | 5,216 | 5,108 | **-2%** | 7,545 | **+48%** |
+| 128K | 4,741 | 4,711 | **-1%** | 7,254 | **+54%** |
+
+**Key Finding:** INT8 KV cache has negligible impact on TP=2 (-1-2%) because the KV cache is already split across GPUs. However, INT8 enables DP=2 at long context (64K+) which was previously impossible due to OOM.
 
 ---
 
@@ -114,6 +127,7 @@ Config      |    4K    |    8K    |   16K    |   32K    |   64K    |  128K
 ------------|----------|----------|----------|----------|----------|----------
 TP=1        |   4,066  |   4,067  |   4,037  |   4,014  |    -     |    -
 TP=2        |   5,612  |   5,600  |   5,572  |   5,371  |   5,216  |   4,741
+TP=2+INT8   |   5,559  |   5,513  |   5,533  |   5,404  |   5,108  |   4,711
 DP=2        |   7,298  |   7,317  |   7,296  |   7,182  |    -     |    -
 DP=2+INT8   |    -     |    -     |    -     |   7,435  |   7,545  |   7,254
 ```
@@ -173,10 +187,12 @@ vllm serve RedHatAI/gemma-3-4b-it-quantized.w4a16 \
 ### For Long Context (64K-128K)
 
 ```bash
-# 4B model with TP=2 for long context
+# 4B model with DP=2 + INT8 KV cache - 7,500 tok/s = 648M tokens/day
 vllm serve RedHatAI/gemma-3-4b-it-quantized.w4a16 \
-    --tensor-parallel-size 2 \
-    --disable-custom-all-reduce \
+    --data-parallel-size 2 \
+    --tensor-parallel-size 1 \
+    --kv-cache-dtype int8 \
+    --calculate-kv-scales \
     --max-model-len 131072
 ```
 
@@ -196,3 +212,5 @@ vllm serve RedHatAI/gemma-3-4b-it-quantized.w4a16 \
 - `throughput-grid-20260317-174312.json` - TP=2 results
 - `throughput-grid-20260317-175603.json` - TP=1 results (4B)
 - `throughput-grid-20260317-190716.json` - DP=2 results
+- `throughput-grid-20260317-192257.json` - DP=2+INT8 results
+- `throughput-grid-20260317-194424.json` - TP=2+INT8 results
