@@ -1,0 +1,88 @@
+{
+  "timestamp": "2026-03-17T19:07:16.436051",
+  "config": {
+    "models": [
+      "1b-w8a8",
+      "4b-w4a16"
+    ],
+    "context_lengths": [
+      4096,
+      8192,
+      16384,
+      32768
+    ],
+    "output_tokens": 128
+  },
+  "results": {
+    "1b-w8a8": {
+      "model": {
+        "name": "RedHatAI/gemma-3-1b-it-quantized.w8a8",
+        "size": "1B",
+        "quant": "W8A8",
+        "model_vram_gb": 1.5,
+        "max_context": 32768
+      },
+      "configs": {
+        "4k": {
+          "context_len": 4096,
+          "optimal_batch_size": 256,
+          "max_throughput": 12233.621775992264,
+          "avg_throughput": 11954.638800692881
+        },
+        "8k": {
+          "context_len": 8192,
+          "optimal_batch_size": 256,
+          "max_throughput": 12513.007739891827,
+          "avg_throughput": 12207.918094161218
+        },
+        "16k": {
+          "context_len": 16384,
+          "optimal_batch_size": 256,
+          "max_throughput": 12160.938636826946,
+          "avg_throughput": 11994.878389457754
+        },
+        "32k": {
+          "context_len": 32768,
+          "optimal_batch_size": 256,
+          "max_throughput": 11975.24335079191,
+          "avg_throughput": 11883.315329549416
+        }
+      }
+    },
+    "4b-w4a16": {
+      "model": {
+        "name": "RedHatAI/gemma-3-4b-it-quantized.w4a16",
+        "size": "4B",
+        "quant": "W4A16",
+        "model_vram_gb": 3.0,
+        "max_context": 131072
+      },
+      "configs": {
+        "4k": {
+          "context_len": 4096,
+          "optimal_batch_size": 256,
+          "max_throughput": 7297.919219825492,
+          "avg_throughput": 7281.547118511684
+        },
+        "8k": {
+          "context_len": 8192,
+          "optimal_batch_size": 256,
+          "max_throughput": 7317.01610131303,
+          "avg_throughput": 7308.038789085771
+        },
+        "16k": {
+          "context_len": 16384,
+          "optimal_batch_size": 256,
+          "max_throughput": 7295.844529205157,
+          "avg_throughput": 7282.0310451935975
+        },
+        "32k": {
+          "context_len": 32768,
+          "optimal_batch_size": 256,
+          "max_throughput": 7181.556047929442,
+          "avg_throughput": 7170.698785923385
+        }
+      }
+    }
+  }
+}

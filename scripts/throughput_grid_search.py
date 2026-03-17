@@ -229,21 +229,27 @@ def launch_server(
     model: str,
     max_model_len: int,
     port: int = 8000,
-    tp: int = 2,  # Tensor parallel size - use both GPUs by default
+    tp: int = 1,  # Tensor parallel size
+    dp: int = 1,  # Data parallel size
     gpu_mem_util: float = 0.85,
 ) -> subprocess.Popen:
     """Launch vLLM server with specified configuration."""
     env = os.environ.copy()
 
-    if tp == 2:
+    total_gpus = tp * dp
+    if total_gpus == 2:
         env["CUDA_VISIBLE_DEVICES"] = "0,1"
-        # NVLink optimizations for dual GPU
+    elif total_gpus == 1:
+        env["CUDA_VISIBLE_DEVICES"] = "0"
+    else:
+        env["CUDA_VISIBLE_DEVICES"] = ",".join(str(i) for i in range(total_gpus))
+
+    if tp == 2:
+        # NVLink optimizations for tensor parallel
         env["CUDA_FORCE_P2P_ACCESS"] = "1"
         env["VLLM_SKIP_P2P_CHECK"] = "1"
         env["NCCL_P2P_LEVEL"] = "NVL"
         env["NCCL_BUFF_SIZE"] = "16777216"
-    else:
-        env["CUDA_VISIBLE_DEVICES"] = "0"
 
     env["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True,max_split_size_mb:512"
 
@@ -265,6 +271,9 @@ def launch_server(
         # Use FULL_DECODE_ONLY to reduce memory during CUDA graph capture
         "--compilation-config", compilation_config,
     ]
+
+    if dp > 1:
+        cmd.extend(["--data-parallel-size", str(dp)])
 
     if tp == 2:
         # Required for CUDA graphs on RTX 3090 with TP=2
@@ -297,7 +306,8 @@ def run_grid_search(
     context_lengths: list[int],
     url: str = "http://localhost:8000",
     no_launch: bool = False,
-    tp: int = 2,  # Tensor parallel size
+    tp: int = 1,  # Tensor parallel size
+    dp: int = 1,  # Data parallel size
     verbose: bool = True,
 ) -> dict:
     """Run full grid search across models and context lengths."""
@@ -324,14 +334,15 @@ def run_grid_search(
 
             try:
                 if not no_launch:
-                    print(f"    Launching server (TP={tp})...", end=" ", flush=True)
+                    mode_str = f"TP={tp}" if dp == 1 else f"DP={dp}"
+                    print(f"    Launching server ({mode_str})...", end=" ", flush=True)
                     # Use conservative memory utilization to avoid OOM during CUDA graph capture
                     base_mem = 0.80
                     if ctx_len >= 65536:
                         base_mem = 0.85
                     elif ctx_len >= 32768:
                         base_mem = 0.82
-                    server_proc = launch_server(model_name, ctx_len, tp=tp, gpu_mem_util=base_mem)
+                    server_proc = launch_server(model_name, ctx_len, tp=tp, dp=dp, gpu_mem_util=base_mem)
 
                     if not wait_for_server(url, timeout=600):
                         print("TIMEOUT")
@@ -471,10 +482,16 @@ Examples:
     )
     parser.add_argument("--url", default="http://localhost:8000", help="Server URL")
     parser.add_argument("--no-launch", action="store_true", help="Use existing server")
-    parser.add_argument("--tp", type=int, default=2, choices=[1, 2], help="Tensor parallel size (default: 2 for dual GPU)")
+    parser.add_argument("--tp", type=int, default=1, choices=[1, 2], help="Tensor parallel size")
+    parser.add_argument("--dp", type=int, default=1, choices=[1, 2], help="Data parallel size (DP=2 runs 2 replicas)")
     parser.add_argument("--output", default=None, help="Output JSON file")
     parser.add_argument("--quiet", action="store_true", help="Less verbose output")
     args = parser.parse_args()
+
+    # Validate: can't use both TP=2 and DP=2 with only 2 GPUs
+    if args.tp * args.dp > 2:
+        print(f"Error: TP={args.tp} * DP={args.dp} = {args.tp * args.dp} GPUs required, but only 2 available")
+        return 1
 
     # Resolve models
     if "all" in args.models:
@@ -494,7 +511,10 @@ Examples:
     print(f"Timestamp: {datetime.now().isoformat()}")
     print(f"Models: {', '.join(models)}")
     print(f"Contexts: {', '.join(f'{c//1024}K' for c in context_lengths)}")
-    print(f"Tensor Parallel: {args.tp} GPU{'s' if args.tp > 1 else ''}")
+    if args.dp > 1:
+        print(f"Data Parallel: {args.dp} replicas (TP={args.tp} each)")
+    else:
+        print(f"Tensor Parallel: {args.tp} GPU{'s' if args.tp > 1 else ''}")
     print(f"Output tokens per request: {OUTPUT_TOKENS}")
 
     try:
@@ -504,6 +524,7 @@ Examples:
             url=args.url,
             no_launch=args.no_launch,
             tp=args.tp,
+            dp=args.dp,
             verbose=not args.quiet,
         )
 

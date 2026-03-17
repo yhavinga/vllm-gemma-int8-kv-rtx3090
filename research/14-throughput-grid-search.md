@@ -16,16 +16,45 @@ Inspired by HuggingFace's Synthetic Data Playbook approach.
 
 | Model | Best Config | Max Throughput | Context Range |
 |-------|-------------|----------------|---------------|
-| **1B W8A8** | TP=1 (single GPU) | **8,109 tok/s** | 4K-32K |
-| **4B W4A16** | TP=2 (dual GPU) | **5,612 tok/s** | 4K-128K |
+| **1B W8A8** | **DP=2** (data parallel) | **12,513 tok/s** | 4K-32K |
+| **4B W4A16** | **DP=2** (data parallel) | **7,317 tok/s** | 4K-32K |
+| **4B W4A16** | TP=2 (for 128K) | **4,741 tok/s** | 64K-128K |
 
-**Critical Insight:**
-- 1B is too small to benefit from tensor parallelism - TP=1 is 13% faster than TP=2
-- 4B benefits significantly from dual GPU - TP=2 is 38% faster than TP=1
+**Critical Insight: Data Parallel beats Tensor Parallel for both models!**
+- 1B: DP=2 is **51% faster** than TP=1, **71% faster** than TP=2
+- 4B: DP=2 is **79% faster** than TP=1, **30% faster** than TP=2
+
+Use TP=2 only when you need long context (64K+) for 4B model.
 
 ---
 
 ## Complete Results
+
+### Gemma 3 1B W8A8
+
+#### DP=2 (Data Parallel, RECOMMENDED)
+
+| Context | Throughput | Optimal Batch | vs TP=1 |
+|---------|------------|---------------|---------|
+| **4K** | **12,234 tok/s** | 256 | +52% |
+| **8K** | **12,513 tok/s** | 256 | +54% |
+| **16K** | **12,161 tok/s** | 256 | +51% |
+| **32K** | **11,975 tok/s** | 256 | +51% |
+
+### Gemma 3 4B W4A16
+
+#### DP=2 (Data Parallel, RECOMMENDED for <64K)
+
+| Context | Throughput | Optimal Batch | vs TP=2 |
+|---------|------------|---------------|---------|
+| **4K** | **7,298 tok/s** | 256 | +30% |
+| **8K** | **7,317 tok/s** | 256 | +31% |
+| **16K** | **7,296 tok/s** | 256 | +31% |
+| **32K** | **7,182 tok/s** | 256 | +34% |
+
+---
+
+## Alternative Configurations (for reference)
 
 ### Gemma 3 1B W8A8
 
