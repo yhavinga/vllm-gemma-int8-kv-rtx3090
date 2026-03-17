@@ -232,6 +232,7 @@ def launch_server(
     tp: int = 1,  # Tensor parallel size
     dp: int = 1,  # Data parallel size
     gpu_mem_util: float = 0.85,
+    int8_kv: bool = False,  # Use INT8 KV cache
 ) -> subprocess.Popen:
     """Launch vLLM server with specified configuration."""
     env = os.environ.copy()
@@ -279,6 +280,10 @@ def launch_server(
         # Required for CUDA graphs on RTX 3090 with TP=2
         cmd.append("--disable-custom-all-reduce")
 
+    if int8_kv:
+        # INT8 KV cache for RTX 3090 (no FP8 hardware)
+        cmd.extend(["--kv-cache-dtype", "int8", "--calculate-kv-scales"])
+
     # Write server logs to file instead of PIPE (avoids buffer blocking)
     log_file = open(f"/tmp/vllm-server-{port}.log", "w")
     return subprocess.Popen(
@@ -308,6 +313,7 @@ def run_grid_search(
     no_launch: bool = False,
     tp: int = 1,  # Tensor parallel size
     dp: int = 1,  # Data parallel size
+    int8_kv: bool = False,  # Use INT8 KV cache
     verbose: bool = True,
 ) -> dict:
     """Run full grid search across models and context lengths."""
@@ -335,6 +341,8 @@ def run_grid_search(
             try:
                 if not no_launch:
                     mode_str = f"TP={tp}" if dp == 1 else f"DP={dp}"
+                    if int8_kv:
+                        mode_str += "+INT8"
                     print(f"    Launching server ({mode_str})...", end=" ", flush=True)
                     # Use conservative memory utilization to avoid OOM during CUDA graph capture
                     base_mem = 0.80
@@ -342,7 +350,7 @@ def run_grid_search(
                         base_mem = 0.85
                     elif ctx_len >= 32768:
                         base_mem = 0.82
-                    server_proc = launch_server(model_name, ctx_len, tp=tp, dp=dp, gpu_mem_util=base_mem)
+                    server_proc = launch_server(model_name, ctx_len, tp=tp, dp=dp, gpu_mem_util=base_mem, int8_kv=int8_kv)
 
                     if not wait_for_server(url, timeout=600):
                         print("TIMEOUT")
@@ -484,6 +492,7 @@ Examples:
     parser.add_argument("--no-launch", action="store_true", help="Use existing server")
     parser.add_argument("--tp", type=int, default=1, choices=[1, 2], help="Tensor parallel size")
     parser.add_argument("--dp", type=int, default=1, choices=[1, 2], help="Data parallel size (DP=2 runs 2 replicas)")
+    parser.add_argument("--int8-kv", action="store_true", help="Use INT8 KV cache (for RTX 3090)")
     parser.add_argument("--output", default=None, help="Output JSON file")
     parser.add_argument("--quiet", action="store_true", help="Less verbose output")
     args = parser.parse_args()
@@ -515,6 +524,8 @@ Examples:
         print(f"Data Parallel: {args.dp} replicas (TP={args.tp} each)")
     else:
         print(f"Tensor Parallel: {args.tp} GPU{'s' if args.tp > 1 else ''}")
+    if args.int8_kv:
+        print(f"KV Cache: INT8")
     print(f"Output tokens per request: {OUTPUT_TOKENS}")
 
     try:
@@ -525,6 +536,7 @@ Examples:
             no_launch=args.no_launch,
             tp=args.tp,
             dp=args.dp,
+            int8_kv=args.int8_kv,
             verbose=not args.quiet,
         )
 
