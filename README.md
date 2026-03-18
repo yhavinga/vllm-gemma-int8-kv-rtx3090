@@ -59,7 +59,8 @@ curl http://localhost:8000/v1/chat/completions \
 | `scripts/launch-server.sh` | 8K | Default, fastest startup |
 | `scripts/launch-server-32k.sh` | 32K | Medium context |
 | `scripts/launch-server-128k.sh` | 128K | Full context (Gemma 3 max) |
-| `scripts/launch-server-int8.sh` | 64K | **INT8 KV cache** - best for long context |
+| `scripts/launch-server-int8.sh` | 64K | INT8 KV cache (global scale) |
+| `scripts/launch-server-final.sh` | 64K | **Recommended** - INT8-K + FP8-V, per-layer scales |
 | `scripts/benchmark.py` | - | Performance measurement |
 | `scripts/quality_compare.py` | - | Quality testing with Dutch text |
 
@@ -73,15 +74,35 @@ curl http://localhost:8000/v1/chat/completions \
 
 ## INT8 KV Cache (RTX 3090 / Ampere)
 
-RTX 3090 lacks FP8 hardware. We implemented INT8 KV cache quantization via custom Triton kernels.
+RTX 3090 lacks FP8 hardware. We implemented quantized KV cache via Triton with two key
+optimizations that recover precision lost by naive INT8 quantization:
+
+### Per-Layer Scales
+
+A single global scale for 62 attention layers wastes precision. Layer 42 has v_absmax=884,
+layer 59 has v_absmax=2.6 — a 340x ratio. Per-layer calibration gives each layer the full
+INT8 dynamic range.
+
+### INT8-K + FP8-V Emulation
+
+K (keys) use INT8 — linear quantization error translates linearly to softmax input.
+V (values) use FP8-E4M3 emulated in INT8 storage — logarithmic spacing preserves relative
+precision across the heavy-tailed distributions in deeper layers. No hardware FP8 required.
 
 **Setup:**
 ```bash
-# Apply patch to vLLM 0.17.1
+# Apply patches to vLLM 0.17.1
 patch -p1 -d $(python -c "import vllm; print(vllm.__path__[0])") < patches/vllm-int8-kv-cache.patch
+python scripts/apply_per_layer_scales_patch.py
 
-# Launch with INT8
-./scripts/launch-server-int8.sh
+# Launch (recommended)
+./scripts/launch-server-final.sh
 ```
 
-See [research/11-int8-kv-cache.md](research/11-int8-kv-cache.md) for implementation details and benchmarks.
+| Config | Performance | Quality |
+|--------|-------------|---------|
+| BF16 KV | 67 tok/s | Baseline |
+| INT8 global scale | 67 tok/s | Precision loss in some layers |
+| **INT8-K + FP8-V per-layer** | **67 tok/s** | **No degradation** |
+
+See [research/11-int8-kv-cache.md](research/11-int8-kv-cache.md) for implementation details.
