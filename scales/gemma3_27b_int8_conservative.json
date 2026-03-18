@@ -1,0 +1,11 @@
+{
+  "model": "RedHatAI/gemma-3-27b-it-quantized.w4a16",
+  "kv_cache_dtype": "int8",
+  "mode": "int8_conservative",
+  "calibration_source": "docs/int8-kv-audit/data/per_layer_scales_gemma3_27b_tp2.csv",
+  "k_absmax": 35.57056451612903,
+  "v_absmax": 314.0,
+  "k_scale": 0.2800831851663703,
+  "v_scale": 2.47244094488189,
+  "notes": "Conservative scales: K at 1.5x mean, V at 75th percentile. Some outlier clipping expected."
+}

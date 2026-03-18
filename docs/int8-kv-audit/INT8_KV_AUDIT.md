@@ -139,3 +139,37 @@ python /tmp/vllm_scale_probe_csv.py
 # Regenerate audit artifacts/plots
 python docs/int8-kv-audit/generate_artifacts.py
 ```
+
+## 9) 27B long-context + benchmark run (V-only FP8-emul, K INT8)
+
+Date: 2026-03-18 (UTC)
+
+Server config used:
+- Model: `RedHatAI/gemma-3-27b-it-quantized.w4a16`
+- GPUs: `2x RTX 3090`, `tensor_parallel_size=2`
+- KV mode: `--kv-cache-dtype int8 --calculate-kv-scales`
+- FP8 emulation toggle: `VLLM_INT8_V_FP8_EMUL=1`
+
+Important runtime caveat:
+- With CUDA-graph capture enabled, startup failed due `.item()` inside scale calc during capture (`operation not permitted when stream is capturing`).
+- For this run, server was launched with `--enforce-eager` to complete functional testing.
+
+One-time calibration:
+- Ran `scripts/calibrate_kv_scales.py` on parliamentary chunks before measurement.
+
+Long-context prompt test:
+- Input corpus: `data/dutch_parliament_text.txt` first ~90k chars.
+- Prompt tokens: `23112`
+- Completion tokens: `220`
+- Elapsed: `32.116s`
+- Completion speed: `6.85 tok/s`
+- Saved raw result: `data/longctx_27b_int8_vfp8e4m3.json`
+
+Benchmark (scripted):
+- Command: `python scripts/benchmark.py --runs 2 --batch-size 2`
+- Single-request avg tok/s:
+  - short: `10.4`
+  - medium: `11.0`
+  - long: `10.9`
+- Batch aggregate throughput (2 concurrent): `19.5 tok/s` (max `21.5`)
+- Saved result: `data/benchmark_27b_int8_vfp8e4m3_eager.json`

@@ -1,0 +1,76 @@
+{
+  "single": {
+    "short": {
+      "prompt": "short",
+      "runs": 2,
+      "avg_tokens_per_sec": 10.355242937241233,
+      "min_tokens_per_sec": 9.824110147076354,
+      "max_tokens_per_sec": 10.886375727406113,
+      "stddev": 0.751135195272236,
+      "details": [
+        {
+          "elapsed": 0.8267214199986483,
+          "prompt_tokens": 16,
+          "completion_tokens": 9,
+          "tokens_per_sec": 10.886375727406113
+        },
+        {
+          "elapsed": 0.9161135070007731,
+          "prompt_tokens": 16,
+          "completion_tokens": 9,
+          "tokens_per_sec": 9.824110147076354
+        }
+      ]
+    },
+    "medium": {
+      "prompt": "medium",
+      "runs": 2,
+      "avg_tokens_per_sec": 10.968122063925698,
+      "min_tokens_per_sec": 10.953296585812609,
+      "max_tokens_per_sec": 10.982947542038785,
+      "stddev": 0.020966392216194354,
+      "details": [
+        {
+          "elapsed": 23.371959117001097,
+          "prompt_tokens": 16,
+          "completion_tokens": 256,
+          "tokens_per_sec": 10.953296585812609
+        },
+        {
+          "elapsed": 23.308861216000878,
+          "prompt_tokens": 16,
+          "completion_tokens": 256,
+          "tokens_per_sec": 10.982947542038785
+        }
+      ]
+    },
+    "long": {
+      "prompt": "long",
+      "runs": 2,
+      "avg_tokens_per_sec": 10.94026466238333,
+      "min_tokens_per_sec": 10.898635765488848,
+      "max_tokens_per_sec": 10.981893559277811,
+      "stddev": 0.058872150574807054,
+      "details": [
+        {
+          "elapsed": 9.470133673999953,
+          "prompt_tokens": 216,
+          "completion_tokens": 104,
+          "tokens_per_sec": 10.981893559277811
+        },
+        {
+          "elapsed": 9.542478732000745,
+          "prompt_tokens": 216,
+          "completion_tokens": 104,
+          "tokens_per_sec": 10.898635765488848
+        }
+      ]
+    }
+  },
+  "batch": {
+    "batch_size": 2,
+    "runs": 2,
+    "avg_aggregate_throughput": 19.49910058547028,
+    "max_aggregate_throughput": 21.46143649396153
+  }
+}

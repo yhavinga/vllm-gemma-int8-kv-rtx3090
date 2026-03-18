@@ -125,18 +125,41 @@
          v_range_val = envs.V_SCALE_CONSTANT
 
 @@ -496,6 +503,14 @@ class Attention(...):
+     def calc_kv_scales(self, query, key, value):
++        # Skip scale calculation entirely during CUDA graph capture.
++        # Tensor creation, .item(), and even some tensor ops are not allowed
++        # during capture. Scales should be pre-calibrated before graph capture.
++        if torch.cuda.is_current_stream_capturing():
++            return
++
+         q_absmax = torch.abs(query).max()
          k_absmax = key.abs().amax()
          v_absmax = value.abs().amax()
++        used_default_k_scale = False
++        used_default_v_scale = False
 
 +        # For INT8: if absmax is too small (warmup with zeros), use a reasonable
-+        # default to avoid division by zero or tiny scales
++        # default to avoid division by zero or tiny scales.
 +        is_int8 = hasattr(self, 'kv_cache_dtype') and self.kv_cache_dtype == 'int8'
 +        if is_int8:
-+            default_absmax = 20.0  # Typical range for transformer K/V
 +            if k_absmax.item() < 0.01:
-+                k_absmax = torch.tensor(default_absmax, device=k_absmax.device)
++                k_absmax = torch.tensor(20.0, device=k_absmax.device, dtype=k_absmax.dtype)
++                used_default_k_scale = True
 +            if v_absmax.item() < 0.01:
-+                v_absmax = torch.tensor(default_absmax, device=v_absmax.device)
++                v_absmax = torch.tensor(20.0, device=v_absmax.device, dtype=v_absmax.dtype)
++                used_default_v_scale = True
 +
-         self.k_scale.copy_(k_absmax / k_range_val)
-         self.v_scale.copy_(v_absmax / v_range_val)
+         self._q_scale.copy_(q_absmax / self.q_range)
+         self._k_scale.copy_(k_absmax / self.k_range)
+         self._v_scale.copy_(v_absmax / self.v_range)
+
++        self._q_scale_float = self._q_scale.item()
++        self._k_scale_float = self._k_scale.item()
++        self._v_scale_float = self._v_scale.item()
++
++        # For INT8 warmup passes with near-zero activations, keep calculation
++        # enabled until at least one non-fallback K/V observation is seen.
++        if is_int8 and (used_default_k_scale or used_default_v_scale):
++            self.calculate_kv_scales = True
++        else:
++            self.calculate_kv_scales = False

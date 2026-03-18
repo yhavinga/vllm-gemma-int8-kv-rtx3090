@@ -1,0 +1,11 @@
+{
+  "model": "RedHatAI/gemma-3-27b-it-quantized.w4a16",
+  "kv_cache_dtype": "int8",
+  "mode": "int8_k_fp8_v",
+  "calibration_source": "docs/int8-kv-audit/data/per_layer_scales_gemma3_27b_tp2.csv",
+  "k_absmax": 71.5,
+  "v_absmax": 884.0,
+  "k_scale": 0.562992125984252,
+  "v_scale": 1.9732142857142858,
+  "notes": "INT8 K + FP8-E4M3 emulated V. Use with VLLM_INT8_V_FP8_EMUL=1"
+}

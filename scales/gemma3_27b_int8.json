@@ -1,0 +1,10 @@
+{
+  "model": "RedHatAI/gemma-3-27b-it-quantized.w4a16",
+  "kv_cache_dtype": "int8",
+  "calibration_method": "empirical",
+  "k_absmax": 20.0,
+  "v_absmax": 20.0,
+  "k_scale": 0.15748031496062992,
+  "v_scale": 0.15748031496062992,
+  "notes": "Default scales for INT8 KV cache. k_scale = v_scale = 20/127 ≈ 0.157"
+}

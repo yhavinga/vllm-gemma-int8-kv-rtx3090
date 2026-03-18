@@ -1,0 +1,10 @@
+{
+  "elapsed_s": 32.116211653999926,
+  "usage": {
+    "prompt_tokens": 23112,
+    "total_tokens": 23332,
+    "completion_tokens": 220,
+    "prompt_tokens_details": null
+  },
+  "response": "## Summary of Dutch Parliamentary Transcript Excerpt (English)\n\nHere's a summary of the provided Dutch parliamentary transcript excerpt, broken down as requested:\n\n**1. Five Bullet Point Summary:**\n\n*   **Budget & Tax Proposals:** The excerpt details the discussion of numerous budget and tax proposals for 1995, including national debt, finance ministry budgets, tax changes related to savings, pensions, and income.\n*   **Focus on Fiscal Discipline:** A recurring theme is the need for fiscal discipline and budget control, with concerns about past spending and the importance of responsible financial management.\n*   **Complexity & Timing of Legislation:** Several speakers criticize the volume and timing of new legislation, expressing concern about the burden on parliament and the potential for rushed or poorly considered laws.\n*   **Debate over Tax Benefits & Fairness:** There's significant debate about the fairness and effectiveness of various tax benefits, particularly those related to savings, pensions, and the wealthy, with calls for simplification and a more equitable distribution.\n*   **Government Accountability & Transparency:**  Several speakers question"
+}
