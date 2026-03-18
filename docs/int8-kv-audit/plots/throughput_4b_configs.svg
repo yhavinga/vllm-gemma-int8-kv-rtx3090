@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="520" viewBox="0 0 980 520">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="490.0" y="34" text-anchor="middle" font-size="22" font-family="sans-serif">4B throughput by context and KV dtype (max tok/s)</text>
+<line x1="90" y1="450" x2="950" y2="450" stroke="#111" stroke-width="1.5"/>
+<line x1="90" y1="70" x2="90" y2="450" stroke="#111" stroke-width="1.5"/>
+<line x1="84" y1="450.00" x2="950" y2="450.00" stroke="#e8e8e8" stroke-width="1"/>
+<text x="80" y="454.00" text-anchor="end" font-size="12" font-family="monospace" fill="#444">4483.990</text>
+<line x1="84" y1="374.00" x2="950" y2="374.00" stroke="#e8e8e8" stroke-width="1"/>
+<text x="80" y="378.00" text-anchor="end" font-size="12" font-family="monospace" fill="#444">5141.437</text>
+<line x1="84" y1="298.00" x2="950" y2="298.00" stroke="#e8e8e8" stroke-width="1"/>
+<text x="80" y="302.00" text-anchor="end" font-size="12" font-family="monospace" fill="#444">5798.884</text>
+<line x1="84" y1="222.00" x2="950" y2="222.00" stroke="#e8e8e8" stroke-width="1"/>
+<text x="80" y="226.00" text-anchor="end" font-size="12" font-family="monospace" fill="#444">6456.331</text>
+<line x1="84" y1="146.00" x2="950" y2="146.00" stroke="#e8e8e8" stroke-width="1"/>
+<text x="80" y="150.00" text-anchor="end" font-size="12" font-family="monospace" fill="#444">7113.779</text>
+<line x1="84" y1="70.00" x2="950" y2="70.00" stroke="#e8e8e8" stroke-width="1"/>
+<text x="80" y="74.00" text-anchor="end" font-size="12" font-family="monospace" fill="#444">7771.226</text>
+<line x1="90.00" y1="70" x2="90.00" y2="456" stroke="#e8e8e8" stroke-width="1"/>
+<text x="90.00" y="472" text-anchor="middle" font-size="12" font-family="monospace" fill="#444">4096</text>
+<line x1="117.74" y1="70" x2="117.74" y2="456" stroke="#e8e8e8" stroke-width="1"/>
+<text x="117.74" y="472" text-anchor="middle" font-size="12" font-family="monospace" fill="#444">8192</text>
+<line x1="173.23" y1="70" x2="173.23" y2="456" stroke="#e8e8e8" stroke-width="1"/>
+<text x="173.23" y="472" text-anchor="middle" font-size="12" font-family="monospace" fill="#444">16384</text>
+<line x1="284.19" y1="70" x2="284.19" y2="456" stroke="#e8e8e8" stroke-width="1"/>
+<text x="284.19" y="472" text-anchor="middle" font-size="12" font-family="monospace" fill="#444">32768</text>
+<line x1="506.13" y1="70" x2="506.13" y2="456" stroke="#e8e8e8" stroke-width="1"/>
+<text x="506.13" y="472" text-anchor="middle" font-size="12" font-family="monospace" fill="#444">65536</text>
+<line x1="950.00" y1="70" x2="950.00" y2="456" stroke="#e8e8e8" stroke-width="1"/>
+<text x="950.00" y="472" text-anchor="middle" font-size="12" font-family="monospace" fill="#444">131072</text>
+<polyline points="90.00,319.60 117.74,321.00 173.23,324.24 284.19,347.50 506.13,365.42 950.00,420.27" fill="none" stroke="#444444" stroke-width="2.4"/>
+<circle cx="90.00" cy="319.60" r="2.8" fill="#444444"/>
+<circle cx="117.74" cy="321.00" r="2.8" fill="#444444"/>
+<circle cx="173.23" cy="324.24" r="2.8" fill="#444444"/>
+<circle cx="284.19" cy="347.50" r="2.8" fill="#444444"/>
+<circle cx="506.13" cy="365.42" r="2.8" fill="#444444"/>
+<circle cx="950.00" cy="420.27" r="2.8" fill="#444444"/>
+<line x1="98" y1="40" x2="120" y2="40" stroke="#444444" stroke-width="2.6"/>
+<text x="126" y="44" font-size="13" font-family="sans-serif" fill="#222">TP=2 BF16</text>
+<polyline points="90.00,325.75 117.74,331.03 173.23,328.76 284.19,343.71 506.13,377.91 950.00,423.79" fill="none" stroke="#c08a00" stroke-width="2.4"/>
+<circle cx="90.00" cy="325.75" r="2.8" fill="#c08a00"/>
+<circle cx="117.74" cy="331.03" r="2.8" fill="#c08a00"/>
+<circle cx="173.23" cy="328.76" r="2.8" fill="#c08a00"/>
+<circle cx="284.19" cy="343.71" r="2.8" fill="#c08a00"/>
+<circle cx="506.13" cy="377.91" r="2.8" fill="#c08a00"/>
+<circle cx="950.00" cy="423.79" r="2.8" fill="#c08a00"/>
+<line x1="98" y1="58" x2="120" y2="58" stroke="#c08a00" stroke-width="2.6"/>
+<text x="126" y="62" font-size="13" font-family="sans-serif" fill="#222">TP=2 INT8</text>
+<polyline points="90.00,124.71 117.74,122.51 173.23,124.95 284.19,138.17" fill="none" stroke="#2e6f40" stroke-width="2.4"/>
+<circle cx="90.00" cy="124.71" r="2.8" fill="#2e6f40"/>
+<circle cx="117.74" cy="122.51" r="2.8" fill="#2e6f40"/>
+<circle cx="173.23" cy="124.95" r="2.8" fill="#2e6f40"/>
+<circle cx="284.19" cy="138.17" r="2.8" fill="#2e6f40"/>
+<line x1="98" y1="76" x2="120" y2="76" stroke="#2e6f40" stroke-width="2.6"/>
+<text x="126" y="80" font-size="13" font-family="sans-serif" fill="#222">DP=2 BF16</text>
+<polyline points="284.19,108.83 506.13,96.21 950.00,129.75" fill="none" stroke="#2f59a7" stroke-width="2.4"/>
+<circle cx="284.19" cy="108.83" r="2.8" fill="#2f59a7"/>
+<circle cx="506.13" cy="96.21" r="2.8" fill="#2f59a7"/>
+<circle cx="950.00" cy="129.75" r="2.8" fill="#2f59a7"/>
+<line x1="98" y1="94" x2="120" y2="94" stroke="#2f59a7" stroke-width="2.6"/>
+<text x="126" y="98" font-size="13" font-family="sans-serif" fill="#222">DP=2 INT8</text>
+<text x="520.0" y="502" text-anchor="middle" font-size="14" font-family="sans-serif">Context length (tokens)</text>
+<text transform="translate(20 260.0) rotate(-90)" text-anchor="middle" font-size="14" font-family="sans-serif">Throughput (tok/s)</text>
+</svg>
