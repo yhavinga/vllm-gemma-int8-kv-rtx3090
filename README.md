@@ -2,6 +2,8 @@
 
 Optimized vLLM configuration for running Gemma 3 27B IT on consumer hardware.
 
+![Summary: +87% speed, 4x context, -50% memory](docs/int8-kv-audit/plots/summary_hero.png)
+
 ## Performance
 
 | Metric | BF16 KV | INT8 KV | Notes |
@@ -12,6 +14,8 @@ Optimized vLLM configuration for running Gemma 3 27B IT on consumer hardware.
 | KV cache memory | 23 GB | 11.5 GB | -50% |
 
 INT8 KV cache trades 9% short-context overhead for +87% long-context speedup and 4x max context.
+
+![27B: INT8 wins at long context (+87%), slight overhead at short (-9%)](docs/int8-kv-audit/plots/throughput_27b_bf16_vs_int8.png)
 
 ## Requirements
 
@@ -69,7 +73,7 @@ A single global scale for 62 attention layers wastes precision. Layer 42 has v_a
 layer 59 has v_absmax=2.6 — a 340x ratio. Per-layer calibration gives each layer the full
 INT8 dynamic range.
 
-![Per-layer KV scales showing 340x variation across 62 layers](docs/int8-kv-audit/plots/per_layer_scales_gemma3_27b_tp2.png)
+![Per-layer K/V ranges: K stable (5.8x), V wild (340x) - solved with INT8-K + FP8-V hybrid](docs/int8-kv-audit/plots/per_layer_scales_hero.png)
 
 ### INT8-K + FP8-V Emulation
 
@@ -218,7 +222,7 @@ vllm serve RedHatAI/gemma-3-1b-it-quantized.w8a8 \
 With the smaller Gemma 3 4B model, INT8 KV cache unlocks data parallelism (DP=2) at long context
 where BF16 would OOM. DP=2 + INT8 achieves +45% higher throughput than TP=2 + BF16 at 128K context.
 
-![Throughput comparison: TP=2 vs DP=2, BF16 vs INT8](docs/int8-kv-audit/plots/throughput_4b_configs.png)
+![4B throughput: DP=2+INT8 enables long context where others OOM](docs/int8-kv-audit/plots/throughput_4b_grouped_bars.png)
 
 | Context | TP=2 BF16 | TP=2 INT8 | DP=2 BF16 | DP=2 INT8 |
 |---------|-----------|-----------|-----------|-----------|
