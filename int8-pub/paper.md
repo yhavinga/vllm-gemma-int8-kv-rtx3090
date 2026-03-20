@@ -261,6 +261,23 @@ Before focusing on 1B/4B throughput, we explored optimizations for 27B on the sa
 
 **Figure 4:** Gemma 3 27B throughput with BF16 vs INT8 KV cache. At short context (<4K), quantization overhead causes -9% regression. Beyond the ~4K crossover point, INT8's memory bandwidth savings dominate: +87% at 7K, +67% at 12K. Maximum context increases from 32K to 128K (4x).
 
+### 5.3 27B Batched Throughput (Short Context)
+
+At short context (<=4K) with high batch sizes, we measured peak throughput:
+
+| Batch Size | BF16 KV | INT8 KV | Difference |
+|------------|---------|---------|------------|
+| 1 | 67 tok/s | 67 tok/s | ~same |
+| 64 | 1,153 tok/s | 1,086 tok/s | BF16 +6% |
+| 128 | 1,394 tok/s | 1,233 tok/s | BF16 +13% |
+| 256 | **1,485 tok/s** | 1,312 tok/s | **BF16 +13%** |
+
+**Key finding:** At short context with high batch, **BF16 outperforms INT8 by 13%**. The INT8 quantization/dequantization overhead hurts when the workload is compute-bound rather than memory-bound.
+
+**Recommendation:**
+- **Short context (<=4K) + high batch**: Use BF16 KV cache → **1,485 tok/s**
+- **Long context (>4K) or need 64K+**: Use INT8 KV cache → enables longer context, +87% at 7K
+
 ### 5.3 The Architectural Bottleneck
 
 Gemma 3's hybrid attention architecture:

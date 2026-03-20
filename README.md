@@ -6,6 +6,8 @@ Optimized vLLM configuration for running Gemma 3 27B IT on consumer hardware.
 
 ## Performance
 
+### Single Request
+
 | Metric | BF16 KV | INT8 KV | Notes |
 |--------|---------|---------|-------|
 | Short context (<4K) | 67 tok/s | 61 tok/s | -9%, compute-bound |
@@ -13,7 +15,15 @@ Optimized vLLM configuration for running Gemma 3 27B IT on consumer hardware.
 | Max context | 32K | **128K** | 4x with same VRAM |
 | KV cache memory | 23 GB | 11.5 GB | -50% |
 
-INT8 KV cache trades 9% short-context overhead for +87% long-context speedup and 4x max context.
+### Batched Throughput (<=4K context)
+
+| Batch Size | BF16 KV | INT8 KV | Winner |
+|------------|---------|---------|--------|
+| 1 | 67 tok/s | 67 tok/s | Tie |
+| 64 | 1,153 tok/s | 1,086 tok/s | BF16 +6% |
+| 256 | **1,485 tok/s** | 1,312 tok/s | **BF16 +13%** |
+
+**Key insight:** At short context with high batch, **BF16 wins** because INT8 quant/dequant overhead hurts when compute-bound. Use INT8 only when you need long context (>4K) or would otherwise OOM.
 
 ![27B: INT8 wins at long context (+87%), slight overhead at short (-9%)](docs/int8-kv-audit/plots/throughput_27b_bf16_vs_int8.png)
 
