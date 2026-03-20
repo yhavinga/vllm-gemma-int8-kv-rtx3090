@@ -13,27 +13,11 @@ Optimized vLLM configuration for running Gemma 3 27B IT on consumer hardware.
 
 INT8 KV cache trades 9% short-context overhead for +87% long-context speedup and 4x max context.
 
-## Quick Start
-
-```bash
-./scripts/launch-server-final.sh    # Recommended: INT8-K + FP8-V, per-layer scales, 64K context
-./scripts/launch-server.sh          # BF16 KV cache, 8K context (faster startup)
-```
-
-Server starts on `http://localhost:8000`. First startup takes ~2 minutes for CUDA graph capture.
-
-```bash
-curl http://localhost:8000/v1/chat/completions \
-    -H "Content-Type: application/json" \
-    -d '{"model": "RedHatAI/gemma-3-27b-it-quantized.w4a16",
-         "messages": [{"role": "user", "content": "Hello!"}]}'
-```
-
 ## Requirements
 
 - 2x RTX 3090 (48GB total VRAM)
 - NVLink bridge (NV4 recommended)
-- Python 3.10+, vLLM 0.17.1
+- Python 3.10+, vLLM 0.17.1 (patched, see below)
 
 ## Documentation
 
