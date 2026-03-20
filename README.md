@@ -16,8 +16,8 @@ INT8 KV cache trades 9% short-context overhead for +87% long-context speedup and
 ## Quick Start
 
 ```bash
-./scripts/launch-server.sh          # BF16 KV cache, 8K context
-./scripts/launch-server-int8.sh     # INT8 KV cache, 64K context (recommended for long context)
+./scripts/launch-server-final.sh    # Recommended: INT8-K + FP8-V, per-layer scales, 64K context
+./scripts/launch-server.sh          # BF16 KV cache, 8K context (faster startup)
 ```
 
 Server starts on `http://localhost:8000`. First startup takes ~2 minutes for CUDA graph capture.
@@ -56,11 +56,13 @@ curl http://localhost:8000/v1/chat/completions \
 
 | Script | Context | Description |
 |--------|---------|-------------|
-| `scripts/launch-server.sh` | 8K | Default, fastest startup |
-| `scripts/launch-server-32k.sh` | 32K | Medium context |
-| `scripts/launch-server-128k.sh` | 128K | Full context (Gemma 3 max) |
-| `scripts/launch-server-int8.sh` | 64K | INT8 KV cache (global scale) |
 | `scripts/launch-server-final.sh` | 64K | **Recommended** - INT8-K + FP8-V, per-layer scales |
+| `scripts/launch-server.sh` | 8K | BF16 KV cache, fastest startup |
+| `scripts/launch-server-32k.sh` | 32K | BF16 KV cache, medium context |
+| `scripts/launch-server-128k.sh` | 128K | BF16 KV cache, full context |
+| `scripts/launch-server-int8.sh` | 64K | INT8 (global scale, superseded by final) |
+| `scripts/launch-server-int8-per-layer.sh` | 64K | INT8 with per-layer scales |
+| `scripts/launch-server-int8k-fp8v.sh` | 64K | INT8-K + FP8-V hybrid |
 | `scripts/benchmark.py` | - | Performance measurement |
 | `scripts/quality_compare.py` | - | Quality testing with Dutch text |
 
