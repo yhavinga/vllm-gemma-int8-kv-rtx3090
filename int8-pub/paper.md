@@ -80,11 +80,9 @@ We measured the K/V activation ranges across all 62 layers of Gemma 3 27B:
 | Maximum | 71.5 (layer 29) | 884.0 (layer 42) |
 | Ratio | 5.8x | **340x** |
 
-![Per-layer KV scales showing 340x variation across 62 layers](../docs/int8-kv-audit/plots/per_layer_scales_gemma3_27b_tp2.png)
+![Per-layer K/V activation ranges with hybrid INT8-K + FP8-V solution](../docs/int8-kv-audit/plots/per_layer_scales_hero.png)
 
-**Figure 1:** Per-layer K and V scales for Gemma 3 27B. The V scales (orange) vary by 340x across layers. Layer 42 dominates with v_absmax=884, while layers 58-61 have values below 15. A global scale optimized for layer 42 means layer 59 uses only ~47 of 127 available INT8 levels—wasting 63% of quantization budget.
-
-**The fix:** Compute and store separate `k_scale` and `v_scale` per attention layer. Memory overhead is negligible (2 floats × 62 layers = 496 bytes), but precision recovery is substantial.
+**Figure 1:** Per-layer K and V activation ranges for Gemma 3 27B (62 layers). K values (blue) are stable with only 5.8x variance—INT8 linear quantization works well. V values (orange) vary by 340x across layers, with layer 42 peaking at 884 while layer 59 drops to 2.6. This wild variance requires FP8-E4M3's logarithmic spacing to handle outliers. Both use per-layer scales (496 bytes overhead).
 
 ### 3.3 Per-Layer Quantization Scheme
 
