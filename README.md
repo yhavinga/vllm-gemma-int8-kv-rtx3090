@@ -83,6 +83,8 @@ A single global scale for 62 attention layers wastes precision. Layer 42 has v_a
 layer 59 has v_absmax=2.6 — a 340x ratio. Per-layer calibration gives each layer the full
 INT8 dynamic range.
 
+![Per-layer KV scales showing 340x variation across 62 layers](docs/int8-kv-audit/plots/per_layer_scales_gemma3_27b_tp2.png)
+
 ### INT8-K + FP8-V Emulation
 
 K (keys) use INT8 — linear quantization error translates linearly to softmax input.
