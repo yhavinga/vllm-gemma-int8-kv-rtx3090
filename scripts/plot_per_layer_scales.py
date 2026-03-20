@@ -261,9 +261,9 @@ def plot_hero_comparison():
     x = data['layers']
     width = 0.4
 
-    bars_k = ax_main.bar(x - width/2, data['k_absmax'], width, label='K absmax',
+    bars_k = ax_main.bar(x - width/2, data['k_absmax'], width, label='K absmax → INT8',
                          color='#636EFA', alpha=0.8)
-    bars_v = ax_main.bar(x + width/2, data['v_absmax'], width, label='V absmax',
+    bars_v = ax_main.bar(x + width/2, data['v_absmax'], width, label='V absmax → FP8-E4M3',
                          color='#EF553B', alpha=0.8)
 
     ax_main.set_xlabel('Layer Index', fontsize=12)
@@ -303,18 +303,26 @@ def plot_hero_comparison():
     • Max: 71.5 (layer 29)
     • Ratio: 5.8x
 
-    SOLUTION
+    ─────────────────────
 
-    Per-layer scales give
-    each layer the full
-    INT8 dynamic range.
+    SOLUTION: HYBRID
 
-    Memory overhead:
-    496 bytes (negligible)
+    K cache: INT8
+    • Stable range (5.8x)
+    • Linear quantization
+    • Uniform spacing OK
+
+    V cache: FP8-E4M3
+    • Wild range (340x)
+    • Log quantization
+    • Handles outliers
+
+    Both use per-layer
+    scales (496 bytes)
     """
 
-    ax_stats.text(0.1, 0.95, stats_text, transform=ax_stats.transAxes,
-                 fontsize=11, verticalalignment='top', fontfamily='monospace',
+    ax_stats.text(0.05, 0.98, stats_text, transform=ax_stats.transAxes,
+                 fontsize=10, verticalalignment='top', fontfamily='monospace',
                  bbox=dict(boxstyle='round', facecolor='lightyellow', alpha=0.9))
 
     plt.tight_layout()
