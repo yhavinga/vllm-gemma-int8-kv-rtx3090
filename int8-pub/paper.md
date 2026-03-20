@@ -213,27 +213,11 @@ Total diff: ~120 lines. Patches available in `patches/`.
 
 ### 4.1 Throughput Comparison (4B W4A16)
 
-![Throughput comparison: TP=2 vs DP=2, BF16 vs INT8 across context lengths](../docs/int8-kv-audit/plots/throughput_4b_configs.png)
+![Throughput by configuration and context length](../docs/int8-kv-audit/plots/throughput_4b_grouped_bars.png)
 
-**Figure 2:** Throughput (tok/s) for Gemma 3 4B across configurations. DP=2+INT8 (green) dominates at all context lengths where it fits in memory. At 64K context, DP=2+INT8 achieves 7,545 tok/s vs TP=2's 5,216 tok/s (+45%). Batch size: 256 concurrent requests.
+**Figure 2:** Gemma 3 4B throughput across all configurations. At short context (4K-32K), DP=2 (green) dominates. At long context (64K-128K), DP=2 OOMs but DP=2+INT8 (purple) delivers +45% over TP=2. INT8 KV cache is the enabler.
 
-### 4.2 Throughput Grid (4B W4A16)
-
-```
-Throughput (tok/s) by Context Length
-
-Config      |    4K    |    8K    |   16K    |   32K    |   64K    |  128K
-------------|----------|----------|----------|----------|----------|----------
-TP=1        |   4,066  |   4,067  |   4,037  |   4,014  |   OOM    |   OOM
-TP=2        |   5,612  |   5,600  |   5,572  |   5,371  |   5,216  |   4,741
-TP=2+INT8   |   5,559  |   5,513  |   5,533  |   5,404  |   5,108  |   4,711
-DP=2        |   7,298  |   7,317  |   7,296  |   7,182  |   OOM    |   OOM
-DP=2+INT8   |    n/t   |    n/t   |    n/t   |   7,435  |   7,545  |   7,254
-
-OOM = Out of memory, n/t = not tested (DP=2 without INT8 works at short context)
-```
-
-### 4.3 Key Findings
+### 4.2 Key Findings
 
 **1. DP=2 beats TP=2 by 30% at short context:**
 - 4K: 7,298 vs 5,612 tok/s (+30%)
@@ -249,7 +233,7 @@ OOM = Out of memory, n/t = not tested (DP=2 without INT8 works at short context)
 
 **4. Optimal configuration: DP=2+INT8 for all context lengths**
 
-### 4.4 1B W8A8 Results
+### 4.3 1B W8A8 Results
 
 ![1B throughput: DP=2 beats TP=2 by 51%](../docs/int8-kv-audit/plots/throughput_1b_configs.png)
 
