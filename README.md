@@ -91,15 +91,135 @@ K (keys) use INT8 — linear quantization error translates linearly to softmax i
 V (values) use FP8-E4M3 emulated in INT8 storage — logarithmic spacing preserves relative
 precision across the heavy-tailed distributions in deeper layers. No hardware FP8 required.
 
-**Setup:**
-```bash
-# Apply patches to vLLM 0.17.1
-patch -p1 -d $(python -c "import vllm; print(vllm.__path__[0])") < patches/vllm-int8-kv-cache.patch
-python scripts/apply_per_layer_scales_patch.py
+---
 
-# Launch (recommended)
+### Patch Installation
+
+The venv in this repository already has all INT8 modifications applied. For a fresh vLLM installation,
+the patch files document the required changes.
+
+**What the patches modify:**
+
+| File | Change |
+|------|--------|
+| `config/cache.py` | Adds `"int8"` to `CacheDType` literal |
+| `v1/attention/backend.py` | Extends `is_quantized_kv_cache()` for INT8 |
+| `v1/attention/backends/triton_attn.py` | Adds `"int8"` to supported dtypes list |
+| `v1/attention/ops/triton_reshape_and_cache_flash.py` | INT8 quantization kernel with optional FP8-V emulation |
+| `v1/attention/ops/triton_unified_attention.py` | INT8 dequantization kernel with FP8-V decode |
+| `model_executor/layers/attention/attention.py` | INT8 range (127), CUDA graph fix, warmup handling |
+
+**Patch files (documentation of changes):**
+- `patches/vllm-int8-kv-cache.patch` - Basic INT8-only support
+- `patches/vllm-int8-kv-cache-with-fp8v.patch` - Full INT8-K + FP8-V hybrid with per-layer scales
+
+**For fresh install:**
+```bash
+# Clone this repo and use the pre-patched venv
+git clone https://github.com/[repo]/gemma-optimization
+cd gemma-optimization
+source venv/bin/activate
+
+# Or apply manually to your vLLM 0.17.1 installation:
+# 1. Review patches/vllm-int8-kv-cache-with-fp8v.patch for changes
+# 2. Apply modifications to corresponding files in your vLLM installation
+# 3. Run: python scripts/apply_per_layer_scales_patch.py
+```
+
+---
+
+### Running the Server
+
+**Recommended (INT8-K + FP8-V with per-layer scales):**
+```bash
 ./scripts/launch-server-final.sh
 ```
+
+**Manual launch with all arguments:**
+```bash
+# Environment variables
+export VLLM_INT8_V_FP8_EMUL=1                              # Enable FP8-V emulation (recommended)
+export VLLM_KV_SCALES_FILE=scales/gemma3_27b_per_layer.json  # Per-layer calibrated scales
+
+# Launch server
+vllm serve RedHatAI/gemma-3-27b-it-quantized.w4a16 \
+    --tensor-parallel-size 2 \
+    --disable-custom-all-reduce \
+    --kv-cache-dtype int8 \
+    --compilation-config '{"cudagraph_mode": "FULL_DECODE_ONLY", "cudagraph_capture_sizes": [1, 2, 4, 8, 16, 32]}' \
+    --max-model-len 65536 \
+    --gpu-memory-utilization 0.90 \
+    --port 8000
+```
+
+**Command line arguments explained:**
+
+| Argument | Value | Purpose |
+|----------|-------|---------|
+| `--tensor-parallel-size` | `2` | Split model across 2 GPUs |
+| `--disable-custom-all-reduce` | - | Required for CUDA graphs on RTX 3090 |
+| `--kv-cache-dtype` | `int8` | Enable INT8 KV cache (requires patch) |
+| `--compilation-config` | `{...}` | Enable CUDA graphs for decode phase |
+| `--max-model-len` | `65536` | Maximum context length (up to 128K) |
+| `--gpu-memory-utilization` | `0.90` | Leave headroom for CUDA graph capture |
+| `--port` | `8000` | API server port |
+
+**Environment variables:**
+
+| Variable | Value | Purpose |
+|----------|-------|---------|
+| `VLLM_INT8_V_FP8_EMUL` | `1` | Use FP8-E4M3 emulation for V cache (handles 340x variance) |
+| `VLLM_KV_SCALES_FILE` | `path/to/scales.json` | Per-layer calibrated scales file |
+
+---
+
+### Optional: Re-calibrate Scales for Your Workload
+
+Pre-calibrated scales are provided in `scales/gemma3_27b_per_layer.json`. To calibrate for your specific workload:
+
+```bash
+# Run calibration with representative text
+python scripts/calibrate_kv_scales.py \
+    --model RedHatAI/gemma-3-27b-it-quantized.w4a16 \
+    --text-file your_calibration_text.txt \
+    --output scales/your_custom_scales.json
+
+# Use your custom scales
+export VLLM_KV_SCALES_FILE=scales/your_custom_scales.json
+```
+
+Calibration typically takes 5-10 minutes and requires ~24GB VRAM.
+
+---
+
+### 4B Model with Data Parallelism (Maximum Throughput)
+
+For smaller models, data parallelism (DP=2) beats tensor parallelism (TP=2) by +30-45%.
+INT8 KV cache enables DP at long context where BF16 OOMs.
+
+```bash
+# 4B W4A16 with DP=2 + INT8 (7,500 tok/s at 64K context)
+vllm serve RedHatAI/gemma-3-4b-it-quantized.w4a16 \
+    --data-parallel-size 2 \
+    --tensor-parallel-size 1 \
+    --kv-cache-dtype int8 \
+    --calculate-kv-scales \
+    --compilation-config '{"cudagraph_mode": "FULL_DECODE_ONLY", "cudagraph_capture_sizes": [1,2,4,8,16,32,64,128,256]}' \
+    --max-model-len 131072 \
+    --gpu-memory-utilization 0.85 \
+    --port 8000
+
+# 1B W8A8 with DP=2 (12,500 tok/s - fastest config)
+vllm serve RedHatAI/gemma-3-1b-it-quantized.w8a8 \
+    --data-parallel-size 2 \
+    --tensor-parallel-size 1 \
+    --compilation-config '{"cudagraph_mode": "FULL_DECODE_ONLY", "cudagraph_capture_sizes": [1,2,4,8,16,32,64,128,256]}' \
+    --max-model-len 32768 \
+    --gpu-memory-utilization 0.85 \
+    --port 8000
+```
+
+---
 
 | Config | Performance | Quality |
 |--------|-------------|---------|

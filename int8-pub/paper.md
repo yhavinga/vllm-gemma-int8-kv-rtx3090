@@ -320,35 +320,62 @@ vllm serve RedHatAI/gemma-3-4b-it-quantized.w4a16 \
     --calculate-kv-scales \
     --max-model-len 131072 \
     --gpu-memory-utilization 0.85 \
-    --compilation-config '{"cudagraph_mode": "FULL_DECODE_ONLY",
-        "cudagraph_capture_sizes": [1,2,4,8,16,32,64,128,256]}'
+    --compilation-config '{"cudagraph_mode": "FULL_DECODE_ONLY", "cudagraph_capture_sizes": [1,2,4,8,16,32,64,128,256]}'
 ```
 
-### 6.3 Key Flags Explained
+### 6.3 27B with INT8-K + FP8-V (Recommended for 27B)
+
+```bash
+# Environment variables for hybrid INT8-K + FP8-V mode
+export VLLM_INT8_V_FP8_EMUL=1                                # FP8-E4M3 emulation for V
+export VLLM_KV_SCALES_FILE=scales/gemma3_27b_per_layer.json  # Per-layer scales
+
+# 27B model - 67 tok/s short context, 45 tok/s at 7K
+vllm serve RedHatAI/gemma-3-27b-it-quantized.w4a16 \
+    --tensor-parallel-size 2 \
+    --disable-custom-all-reduce \
+    --kv-cache-dtype int8 \
+    --max-model-len 65536 \
+    --gpu-memory-utilization 0.90 \
+    --compilation-config '{"cudagraph_mode": "FULL_DECODE_ONLY", "cudagraph_capture_sizes": [1, 2, 4, 8, 16, 32]}' \
+    --port 8000
+```
+
+### 6.4 Key Flags Explained
 
 | Flag | Purpose |
 |------|---------|
-| `--data-parallel-size 2` | Run 2 independent model replicas |
-| `--tensor-parallel-size 1` | Each replica on 1 GPU |
+| `--data-parallel-size 2` | Run 2 independent model replicas (best for 1B/4B) |
+| `--tensor-parallel-size 2` | Split model across 2 GPUs (required for 27B) |
+| `--tensor-parallel-size 1` | Each replica on 1 GPU (use with DP=2) |
+| `--disable-custom-all-reduce` | Required for CUDA graphs on RTX 3090 |
 | `--kv-cache-dtype int8` | Enable INT8 KV cache (requires patch) |
-| `--calculate-kv-scales` | Compute per-layer quantization scales |
+| `--calculate-kv-scales` | Compute scales at runtime (alternative to VLLM_KV_SCALES_FILE) |
 | `--compilation-config {...}` | Enable CUDA graphs for decode phase |
-| `--gpu-memory-utilization 0.85` | Leave headroom for CUDA graph capture |
+| `--max-model-len N` | Maximum context length (up to 128K for 4B, 65K for 27B) |
+| `--gpu-memory-utilization 0.85-0.90` | Leave headroom for CUDA graph capture |
+
+**Environment Variables:**
+
+| Variable | Purpose |
+|----------|---------|
+| `VLLM_INT8_V_FP8_EMUL=1` | Use FP8-E4M3 emulation for V cache (handles 340x variance) |
+| `VLLM_KV_SCALES_FILE=path` | Load pre-calibrated per-layer scales from JSON file |
 
 ## 7. Reproduction
 
 ### 7.1 Environment
 
 ```bash
+# Clone repository (includes pre-patched vLLM in venv)
 git clone https://github.com/[repo]/gemma-optimization
 cd gemma-optimization
-python -m venv venv && source venv/bin/activate
-pip install vllm==0.17.1
+source venv/bin/activate
 
-# Apply INT8 patch with per-layer scale support
-patch -p1 -d $(python -c "import vllm; print(vllm.__path__[0])") \
-    < patches/vllm-int8-kv-cache.patch
-python scripts/apply_per_layer_scales_patch.py
+# Or for fresh install, manually apply changes documented in:
+#   patches/vllm-int8-kv-cache-with-fp8v.patch
+# Then run:
+#   python scripts/apply_per_layer_scales_patch.py
 ```
 
 ### 7.2 Calibrate Per-Layer Scales (Optional)
