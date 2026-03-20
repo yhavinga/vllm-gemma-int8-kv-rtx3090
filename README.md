@@ -120,4 +120,6 @@ where BF16 would OOM. DP=2 + INT8 achieves +45% higher throughput than TP=2 + BF
 | 64K | 5,216 | 5,108 | OOM | **7,545** |
 | 128K | 4,741 | 4,711 | OOM | **7,254** |
 
+Batch size: 256 concurrent requests. Throughput in tokens/second.
+
 See [research/11-int8-kv-cache.md](research/11-int8-kv-cache.md) for implementation details.
