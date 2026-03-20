@@ -1,4 +1,4 @@
-# INT8 KV Cache for Consumer GPUs: Per-Layer Quantization Enables Data-Parallel Inference
+# Per-Layer INT8 KV Cache: 2x Context and +87% Speed on Consumer Ampere GPUs
 
 **Hardware:** 2x RTX 3090 (48GB VRAM, NVLink NV4)
 **Software:** vLLM 0.17.1, CUDA 12.x, Triton 3.x
@@ -9,6 +9,10 @@
 We present an INT8 KV cache implementation for vLLM that enables data-parallel inference on consumer Ampere GPUs lacking FP8 hardware. Our key contribution is **per-layer quantization scales**, which recover precision lost by naive global scaling. On Gemma 3 27B, we discovered a **340x variation** in value magnitudes across layers—layer 42 has `v_absmax=884` while layer 59 has `v_absmax=2.6`. A global scale wastes 63% of quantization budget on low-magnitude layers. Per-layer calibration gives each layer the full INT8 dynamic range.
 
 On Gemma 3 4B, our approach achieves **7,545 tok/s** at 64K context with data parallelism—**45% faster** than tensor parallelism with FP16 KV cache. The enabling insight: INT8 halves KV cache memory, allowing two independent model replicas where tensor parallelism previously required splitting one model across GPUs.
+
+![Summary: +87% speed, 4x context, -50% memory](../docs/int8-kv-audit/plots/summary_hero.png)
+
+**Figure 0:** Key results on Gemma 3 27B with 2x RTX 3090. INT8 KV cache with per-layer scales delivers +87% throughput at long context, 4x maximum context length, and 50% memory reduction.
 
 ## 1. Motivation
 
@@ -247,15 +251,9 @@ OOM = Out of memory, n/t = not tested (DP=2 without INT8 works at short context)
 
 ### 4.4 1B W8A8 Results
 
-```
-Config   |    4K    |    8K    |   16K    |   32K
----------|----------|----------|----------|----------
-TP=1     |   8,069  |   8,109  |   8,075  |   7,949
-TP=2     |   7,148  |   7,179  |   7,091  |   6,848  ← SLOWER than TP=1
-DP=2     |  12,234  |  12,513  |  12,161  |  11,975  ← Best (+51%)
-```
+![1B throughput: DP=2 beats TP=2 by 51%](../docs/int8-kv-audit/plots/throughput_1b_configs.png)
 
-1B is too small for tensor parallelism. NVLink overhead exceeds compute benefit. DP=2 achieves near-linear 2x scaling.
+**Figure 3:** Gemma 3 1B throughput across parallelism strategies. TP=2 (red) is actually *slower* than TP=1 (blue)—NVLink overhead exceeds compute benefit for this small model. DP=2 (green) achieves near-linear 2x scaling with +51% over TP=1.
 
 ## 5. What Didn't Work (Gemma 3 27B)
 
@@ -277,14 +275,9 @@ Before focusing on 1B/4B throughput, we explored optimizations for 27B on the sa
 
 ### 5.2 27B INT8 Results (TP=2, Per-Layer Scales)
 
-| Context | BF16 KV | INT8 KV | Change |
-|---------|---------|---------|--------|
-| Short (<4K) | 67 tok/s | 61 tok/s | **-9%** |
-| 7K tokens | 24 tok/s | **45 tok/s** | **+87%** |
-| 12K tokens | 24 tok/s | **40 tok/s** | **+67%** |
-| Max context | 32K | **128K** | **4x** |
+![27B: INT8 wins at long context (+87%), loses slightly at short (-9%)](../docs/int8-kv-audit/plots/throughput_27b_bf16_vs_int8.png)
 
-**Interpretation:** At short context, quantization/dequantization overhead dominates. At long context, memory bandwidth becomes the bottleneck, and INT8's 2x memory reduction wins decisively. The crossover point is ~4K tokens.
+**Figure 4:** Gemma 3 27B throughput with BF16 vs INT8 KV cache. At short context (<4K), quantization overhead causes -9% regression. Beyond the ~4K crossover point, INT8's memory bandwidth savings dominate: +87% at 7K, +67% at 12K. Maximum context increases from 32K to 128K (4x).
 
 ### 5.3 The Architectural Bottleneck
 
