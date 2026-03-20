@@ -107,4 +107,17 @@ python scripts/apply_per_layer_scales_patch.py
 | INT8 global scale | 67 tok/s | Precision loss in some layers |
 | **INT8-K + FP8-V per-layer** | **67 tok/s** | **No degradation** |
 
+### INT8 Enables Data Parallelism at Long Context (4B model)
+
+With the smaller Gemma 3 4B model, INT8 KV cache unlocks data parallelism (DP=2) at long context
+where BF16 would OOM. DP=2 + INT8 achieves +45% higher throughput than TP=2 + BF16 at 128K context.
+
+![Throughput comparison: TP=2 vs DP=2, BF16 vs INT8](docs/int8-kv-audit/plots/throughput_4b_configs.png)
+
+| Context | TP=2 BF16 | TP=2 INT8 | DP=2 BF16 | DP=2 INT8 |
+|---------|-----------|-----------|-----------|-----------|
+| 32K | 5,371 | 5,403 | 7,182 | **7,435** |
+| 64K | 5,216 | 5,108 | OOM | **7,545** |
+| 128K | 4,741 | 4,711 | OOM | **7,254** |
+
 See [research/11-int8-kv-cache.md](research/11-int8-kv-cache.md) for implementation details.
