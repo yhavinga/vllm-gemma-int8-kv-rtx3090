@@ -4,14 +4,14 @@ Optimized vLLM configuration for running Gemma 3 27B IT on consumer hardware.
 
 ## Performance
 
-| Metric | BF16 KV | INT8 KV |
-|--------|---------|---------|
-| Short context (<4K) | 67 tok/s | 61 tok/s |
-| Long context (7K) | 24 tok/s | **45 tok/s** |
-| Batch (4 concurrent) | 244 tok/s | - |
-| Max context | 32K | **128K** |
+| Metric | BF16 KV | INT8 KV | Notes |
+|--------|---------|---------|-------|
+| Short context (<4K) | 67 tok/s | 61 tok/s | -9%, compute-bound |
+| Long context (7K) | 24 tok/s | **45 tok/s** | **+87%**, memory-bound |
+| Max context | 32K | **128K** | 4x with same VRAM |
+| KV cache memory | 23 GB | 11.5 GB | -50% |
 
-INT8 KV cache enables 2x longer context and +87% faster long-context inference on RTX 3090.
+INT8 KV cache trades 9% short-context overhead for +87% long-context speedup and 4x max context.
 
 ## Quick Start
 
